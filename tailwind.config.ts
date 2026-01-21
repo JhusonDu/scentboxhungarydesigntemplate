@@ -19,8 +19,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        body: ['Outfit', 'system-ui', 'sans-serif'],
+        display: ['"DM Serif Display"', 'Georgia', 'serif'],
+        body: ['"DM Sans"', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'hero': 'clamp(2.4rem, 4vw, 4rem)',
