@@ -47,11 +47,11 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-hero font-display font-bold leading-[1.1] mb-6"
+            className="text-hero font-display leading-[1.15] mb-6"
           >
-            <span className="text-foreground">Az Illat Művészete.</span>
+            <span className="text-foreground">Luxus Illatok.</span>
             <br />
-            <span className="text-gradient-gold">Neked Válogatva.</span>
+            <span className="text-gradient-gold">Egy Dobozban.</span>
           </motion.h1>
           
           {/* Subheadline */}
@@ -61,8 +61,8 @@ export const Hero = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-2xl"
           >
-            Fedezd fel prémium parfüm kollekciónkat. 
-            100% eredeti illatok, szakértők által válogatva, a küszöbödre szállítva.
+            Próbáld ki a világ legjobb designer parfümjeit — mielőtt elköteleződnél. 
+            100% eredeti, prémium dekantok, közvetlenül hozzád.
           </motion.p>
           
           {/* CTAs */}
