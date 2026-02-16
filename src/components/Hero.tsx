@@ -129,20 +129,19 @@ export const Hero = () => {
               asChild
             >
               <Link to="/termekek">
-                <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                Nézd Meg az Illatokat 🔥
+                Böngészd az Illatokat
                 <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
             <Button
-              variant="ghost"
+              variant="outline"
               size="lg"
-              className="text-foreground/80 hover:text-primary hover:bg-primary/5 font-semibold tracking-wider uppercase px-5 h-11 text-xs rounded-md transition-all duration-300"
-              onClick={() =>
-                document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })
-              }
+              className="border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 font-semibold tracking-wider uppercase px-6 h-11 text-xs rounded-md transition-all duration-300"
+              asChild
             >
-              Hogyan Működik?
+              <Link to="/termekek?bundle=true">
+                Állítsd Össze a Dobozod
+              </Link>
             </Button>
           </motion.div>
         </div>
