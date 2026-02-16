@@ -1,57 +1,63 @@
 
-# Featured Products Showcase Section
+# Redesign FeaturedProducts Section
 
 ## Overview
-Create a new `FeaturedProducts` component that renders a visually stunning, static product showcase grid right after the Hero section on the homepage. This uses hardcoded sample data with local product images, Framer Motion animations, wishlist toggle, quick-view modal, and add-to-cart toast notifications.
+Completely rewrite `FeaturedProducts.tsx` to be a product-first, minimal-text showcase that loads **real Shopify products** instead of hardcoded data. Add a pop-up filter for instant product search, quick add-to-cart via the existing cart store, and a "Buy Now" button that adds to cart and opens checkout immediately.
 
-## Files to Create / Modify
+## Key Changes
 
-### 1. New file: `src/components/FeaturedProducts.tsx`
-The main section component containing:
+### 1. Replace hardcoded data with real Shopify products
+- Use the existing `useProducts()` hook to fetch products from Shopify
+- Show loading skeletons while data loads
+- Display "Nincs termek" empty state if no products exist
 
-**Section layout:**
-- `py-16 md:py-24` padding, gradient background from `bg-background` to a slightly lighter dark tone
-- Max-width container with `max-w-7xl mx-auto px-6`
+### 2. Minimal header text
+- Remove the large heading and subtitle paragraph
+- Keep only a small "KEDVENCEINK" badge and a compact one-line heading
+- "Osszes Megtekintese" link stays, but everything is tighter
 
-**Header area:**
-- Flex row with text left, "Osszes Megtekintese" link right-aligned on desktop
-- Gold badge "LEGNEPSZERUBB", heading "Kedvenceink" in Playfair Display, subtitle in muted text
+### 3. Pop-up filter (works on both mobile and desktop)
+- A filter/search button at the top of the section that opens a `Popover` (or small `Dialog` on mobile)
+- Contains a text input for instant search across all products (uses the `query` parameter of `useProducts`)
+- Filter results update the grid in real-time via debounced search
+- Filter chips for vendor/brand if available from the product data
 
-**Product grid:**
-- `grid-cols-2 md:grid-cols-3 lg:grid-cols-4` responsive grid
-- 8 hardcoded sample products with data matching the specification (Dior Sauvage, Valentino Donna, YSL Libre, Chanel Bleu, etc.)
-- Maps available local images from `src/assets/products/` to the sample products; products without local images (Prada Paradoxe, Versace Eros, Gucci Bloom) will use a fallback placeholder
+### 4. Product card redesign -- product-emphasized
+- Larger image area, smaller text footprint
+- Brand name (vendor) as tiny label
+- Product title -- one line, truncated
+- Price prominent
+- Two quick-action buttons on hover (desktop) / always visible (mobile):
+  - **"+ Kosar"** -- adds the first available variant to the Shopify cart via `useCartStore.addItem()` with toast confirmation
+  - **"Vasarlas"** -- adds to cart, then immediately opens the Shopify checkout URL in a new tab (uses `getCheckoutUrl()` after addItem completes)
 
-**Each product card (inline within the component):**
-- `bg-card rounded-xl overflow-hidden` with Framer Motion `whileHover={{ scale: 1.03, y: -5 }}`
-- Staggered fade-in using `whileInView` with `viewport={{ once: true }}`
-- Image section: aspect-square, hover scale on image, discount badge top-left, wishlist heart top-right (toggleable with local state), hover overlay with "Gyors Megtekintes" button
-- Content section: brand name in gold, title, description (hidden on mobile), price with optional strikethrough, "Kosarba" button
-- Quick view button opens a Dialog modal showing product details
+### 5. Mobile-first layout
+- `grid-cols-2` on mobile with compact `gap-3`, cards with `p-2`
+- Action buttons always visible on mobile (no hover-dependent UI)
+- Smaller image aspect ratio on mobile (`aspect-[3/4]`) for better scroll density
+- Filter button is a sticky floating pill at the top of the section on mobile
 
-**Interactions:**
-- Wishlist heart toggles filled/outlined with a scale animation
-- Add to cart triggers a `sonner` toast
-- Quick view opens a `Dialog` (from existing ui/dialog)
-- All transitions smooth with `duration-300`
+## Files to Modify
 
-**Mobile optimizations:**
-- Smaller padding (`p-3`), font sizes (`text-sm`, `text-xl`), button sizes
-- Description hidden on mobile
-- Price and button stack on very small screens
+### `src/components/FeaturedProducts.tsx` -- full rewrite
+- Import `useProducts` from hooks, `useCartStore` from stores
+- Import `Popover`/`PopoverTrigger`/`PopoverContent` from UI for the filter
+- State: `searchQuery`, `debouncedQuery` (with 300ms debounce)
+- Fetch: `useProducts(12, debouncedQuery || undefined)`
+- Grid: responsive `grid-cols-2 md:grid-cols-3 lg:grid-cols-4`
+- Each card renders real Shopify product data with image, vendor, title, price
+- Quick actions: "+ Kosar" calls `addItem()` with first variant, "Vasarlas" calls `addItem()` then opens checkout
+- Framer Motion kept for stagger entry and hover lift
+- Filter popover: text input + optional vendor chips extracted from loaded products
 
-**Accessibility:**
-- Alt text on all images, aria-labels on icon buttons
-- `focus-visible:ring-2 ring-primary` on interactive elements
-
-### 2. Modify: `src/pages/Index.tsx`
-- Import `FeaturedProducts`
-- Place `<FeaturedProducts />` between `<Hero />` and `<BestsellersSection />`
+### `src/pages/Index.tsx` -- no changes needed
+Already imports and renders `<FeaturedProducts />`
 
 ## Technical Details
 
-- Uses existing design tokens: `primary` (gold), `card`, `background`, `muted-foreground`, `badge-gold` class
-- Uses existing dependencies: `framer-motion`, `lucide-react` (Heart, ShoppingBag, Eye icons), `sonner` toast, `@radix-ui/react-dialog`
-- Local product images mapped where available; ShoppingBag icon placeholder for missing ones
-- No new dependencies required
-- No backend/database changes needed -- purely static/presentational component
+- Real Shopify cart integration via existing `useCartStore` (Zustand) -- same flow as `ProductCard.tsx`
+- "Buy Now" flow: `addItem()` -> wait for cart creation -> `getCheckoutUrl()` -> `window.open(url, '_blank')`
+- Filter uses the Shopify Storefront API `query` parameter (e.g. `title:sauvage` or free text search)
+- Debounced search prevents excessive API calls
+- Loading state shows skeleton cards (4-8 placeholders matching grid)
+- No new dependencies needed -- uses existing `Popover`, `framer-motion`, `sonner`, `useProducts`, `useCartStore`
