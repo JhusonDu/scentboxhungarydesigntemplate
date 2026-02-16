@@ -202,11 +202,8 @@ export const FeaturedProducts = () => {
         {/* Header – compact */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] tracking-widest uppercase text-primary font-semibold bg-primary/10 px-2.5 py-1 rounded-full">
-              Kedvenceink
-            </span>
-            <h2 className="font-display text-lg md:text-xl text-foreground">
-              Termékek
+            <h2 className="font-display text-xl md:text-2xl text-foreground">
+              Nagyvárad legnépszerűbb termékei
             </h2>
           </div>
 
