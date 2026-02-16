@@ -141,12 +141,12 @@ export const Hero = ({ onSearchOpen, onFinderOpen }: HeroProps) => {
             {/* Finder link */}
             <motion.button
               onClick={onFinderOpen}
-              className="mt-2.5 flex items-center justify-center gap-1.5 mx-auto text-xs text-primary/70 hover:text-primary transition-colors cursor-pointer group"
-              animate={{ opacity: [0.7, 1, 0.7] }}
+              className="mt-3 flex items-center justify-center gap-2 mx-auto px-5 py-2.5 rounded-full text-xs font-medium text-primary hover:text-primary-foreground bg-primary/15 hover:bg-primary/90 backdrop-blur-md border border-primary/30 hover:border-primary/60 cursor-pointer group transition-all duration-300"
+              animate={{ boxShadow: ["0 0 15px hsl(43 65% 52% / 0.15)", "0 0 25px hsl(43 65% 52% / 0.3)", "0 0 15px hsl(43 65% 52% / 0.15)"] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Sparkles className="w-3 h-3" />
-              <span className="font-body underline underline-offset-2 decoration-primary/30 group-hover:decoration-primary/60 transition-colors">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="font-body tracking-wide">
                 Nem tudod, mit keresel? Segítünk megtalálni!
               </span>
             </motion.button>
