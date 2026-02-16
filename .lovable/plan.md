@@ -1,145 +1,100 @@
 
-
-# Bundle Builder Redesign: Inline Section with Full Flow
+# Bundle Builder: Convert to "Coming Soon" Inquiry System
 
 ## Overview
-Remove the "Allitsd Ossze a Dobozod" button from the Hero section. Replace the current `BundleBuilder` component with a completely redesigned inline section that appears as the **3rd block** on the landing page (after Bestsellers). The new builder walks customers through selecting size, picking perfumes from the real Shopify catalog, reviewing their box, and adding it to the cart -- all within an interactive, animated inline widget.
+Transform the Bundle Builder from a cart-adding purchase flow into a **"Coming Soon" inquiry form** that collects customer interest data. Users go through the same selection steps (size + perfumes) but instead of adding to cart, they **submit their preferences** as an inquiry. This data is stored in the database so you can gauge demand before launching.
 
 ---
 
-## Landing Page Section Order (after changes)
+## What Changes
 
-1. Hero (search bar + single "Bongeszd az Illatokat" CTA only)
-2. BestsellersSection ("Kedvenceink")
-3. **BundleBuilder** (redesigned inline builder) -- NEW POSITION, same as current
-4. AuthenticitySection
-5. HowItWorksSection
-6. NewsletterSection
-7. Footer
+### 1. "Coming Soon" Banner
+Add a prominent banner at the top of the Bundle Builder section (before the stepper) that clearly communicates:
+- **Badge**: "Hamarosan Erkezik" (Coming Soon) instead of "Egyedi Osszeallitas"
+- **Subtitle update**: Explain that users can submit their preferences now and will receive a discount when the service launches
+- A small highlighted info box: "Jelezd az erdeklodesedet es **2000 Ft kedvezmenyt kapsz** az indulaskor!"
 
-The `BundleBuilder` is already in position 3 in `Index.tsx` (after `BestsellersSection`), so no reordering is needed -- only the Hero button removal and the component rewrite.
+### 2. Size Step Update
+Expand the size options to include larger bottle sizes alongside decants:
 
----
-
-## Hero Changes
-
-**File: `src/components/Hero.tsx`**
-
-- Remove the secondary "Allitsd Ossze a Dobozod" outline button entirely (lines 177-192)
-- Keep only the primary "Bongeszd az Illatokat" button, centered and full-width on mobile
-- Remove the `flex-row` split layout since there is now only one button
-
----
-
-## Redesigned BundleBuilder: Step-by-Step Flow
-
-**File: `src/components/BundleBuilder.tsx`** (full rewrite)
-
-### Section Header
-- Gold badge: "Egyedi Osszeallitas"
-- Title: "Allitsd Ossze a Sajat Dobozkadat"
-- Subtitle explaining the concept
-- A small help icon (HelpCircle / CircleHelp from lucide) next to the title that opens a tooltip or small popover explaining the decanting process, with a "Tudj meg tobbet" link pointing to a future `/rolunk` or `/dekantolas` page
-
-### Progress Stepper (4 steps)
-Horizontal stepper with numbered circles, connecting lines, and step labels:
-
-| Step | Title | Description |
+| Option | Label | Description |
 |---|---|---|
-| 1 | Meret Kivalasztasa | Choose decant size |
-| 2 | Illatok Kivalasztasa | Pick perfumes from the catalog |
-| 3 | Attekintes | Review selections and see total price |
-| 4 | Kosarba | Add to cart confirmation |
+| 5ml | 5ml dekant | Tokeletes kiprobalashoz |
+| 10ml | 10ml dekant | Idealis mindennapi hasznalatra |
+| 3x 10ml | 3x 10ml csomag | 3 db 10ml-es dekant kedvezmenyesen (-2000 Ft) |
+| 3x 50ml | 3x 50ml csomag | 3 db 50ml-es uveg kedvezmenyesen (-2000 Ft) |
 
-Each step circle animates: completed = gold with checkmark, current = gold filled, future = gray outline. `framer-motion` `layoutId` transitions on the progress indicator.
+The bundle options (3x 10ml, 3x 50ml) will show the discount badge directly on the card.
 
-### Step 1: Size Selection
-Three size cards in a grid (md:grid-cols-3):
+### 3. Perfume Step -- No Changes Needed
+The perfume selection grid remains the same -- users pick which perfumes they are interested in. The max selection limits will be adjusted:
+- 5ml: 1-5 perfumes
+- 10ml: 1-3 perfumes  
+- 3x 10ml: exactly 3 perfumes
+- 3x 50ml: exactly 3 perfumes
 
-| Size | Description | Price hint |
-|---|---|---|
-| 5ml | Tokeletes kiprobalashoz | From the cheapest 5ml variant price in Shopify |
-| 10ml | Idealis mindennapi hasznalatra | From 10ml variant prices |
-| 15ml | Premium meretu dekant | From 15ml variant prices |
+### 4. Review Step Redesign
+Replace the current review with an improved overview:
+- Show selected size and all chosen perfumes with images, names, vendors
+- Instead of showing real prices, show **estimated/indicative pricing** with a note that final prices will be confirmed at launch
+- For bundle options, show the discount line item (e.g., "Csomag kedvezmeny: -2 000 Ft")
+- Add **email and name input fields** for the inquiry submission
+- Replace the "Kosarba" button with **"Erdeklodes Beküldese"** (Submit Interest)
 
-- Cards show size, description, and starting price
-- Selected card gets a gold border + subtle glow animation
-- Clicking a card selects that size and enables the "Tovabb" button
+### 5. Replace Cart Logic with Database Submission
+- Remove all `useCartStore` / `addItem` calls from `BundleBuilder.tsx`
+- Create a new database table `bundle_inquiries` to store submissions
+- On submit, insert a row with: name, email, selected size, selected product IDs/titles, timestamp
+- Step 4 becomes a **thank-you confirmation** instead of cart success
 
-### Step 2: Perfume Selection (from Shopify)
-- Fetch all products using the existing `useProducts` hook
-- Display products in a scrollable grid (2 cols mobile, 3 cols desktop)
-- Each product card shows: image thumbnail, title, vendor, and the **price for the selected size variant**
-- Cards are toggleable (click to select/deselect)
-- Selected cards get a gold border + a small check badge in the corner
-- A sticky bottom bar shows: "X illat kivalasztva" count + running total price
-- The number of selectable perfumes depends on size:
-  - 5ml: select 1-5 perfumes
-  - 10ml: select 1-3 perfumes
-  - 15ml: select 1-3 perfumes
-- Search/filter input at the top to filter products by name
+### 6. Success Step Update
+Replace cart-related messaging with:
+- Checkmark animation (keep existing)
+- Title: "Koszonjuk az erdeklodesedet!"
+- Text: "Amint elerheto lesz ez a szolgaltatas, ertesitunk es automatikusan megkapod a 2000 Ft kedvezmenyt."
+- Remove "Tovabb a fizeteshez" button
+- Keep "Folytasd a bongeszes" button
 
-### Step 3: Review
-- Summary card showing:
-  - Selected size (e.g., "5ml dekantok")
-  - List of selected perfumes with image, name, vendor, and individual price
-  - Total price calculation (sum of selected variant prices)
-  - An edit button per section that jumps back to that step
-- A small info box with a CircleHelp icon: "Hogyan keszulnek a dekantjaink?" linking to the decanting info page
-
-### Step 4: Add to Cart
-- On clicking "Kosarba", use the existing cart store (`useCartStore`) to add each selected variant
-- Show a success animation (checkmark + confetti-style gold sparkle)
-- Display a "Tovabb a fizeteshez" button that opens the cart drawer
-- Also show a "Folytasd a bongeszes" link to scroll back up
-
-### Navigation Buttons
-- "Vissza" (back) and "Tovabb" (next) buttons at the bottom of each step
-- "Tovabb" is disabled until the step's requirements are met (e.g., size selected, at least 1 perfume chosen)
-- `AnimatePresence` slide transitions between steps (slide left on forward, right on backward)
+### 7. Step Progress Labels
+Update step 4 label from "Kosarba" to "Elkuldés"
 
 ---
 
-## Help/Info Popover: Decanting Process
+## Database
 
-A small popover (using the existing Popover component) triggered by a CircleHelp icon, containing:
+Create a new `bundle_inquiries` table:
 
-- **Title**: "Mi az a dekantolas?"
-- **Short text**: 2-3 sentences explaining that decanting means transferring perfume from the original bottle into smaller atomizer vials, maintaining 100% authenticity
-- **Bullet points**: Quality control, certified process, original bottles
-- **Link**: "Reszletes informacio" pointing to `/rolunk` (or a future dedicated page)
+```
+bundle_inquiries
+- id (uuid, primary key)
+- name (text, not null)
+- email (text, not null)
+- selected_size (text, not null) -- e.g. "5ml", "10ml", "3x10ml", "3x50ml"
+- selected_products (jsonb, not null) -- array of {id, title, vendor}
+- created_at (timestamptz, default now())
+```
 
-This popover appears:
-1. Next to the section title in the header area
-2. In the Step 3 review summary
+RLS: Allow anonymous inserts (no auth required), no select/update/delete for anon users. This is a public-facing inquiry form.
 
 ---
 
-## Technical Details
+## Files to Modify
 
-### Files to modify:
-1. **`src/components/Hero.tsx`** -- Remove the secondary "Allitsd Ossze a Dobozod" button and simplify the CTA layout to a single centered button
-2. **`src/components/BundleBuilder.tsx`** -- Full rewrite with the 4-step flow described above
+| File | Changes |
+|---|---|
+| `src/components/BundleBuilder.tsx` | Remove cart store imports, replace `handleAddToCart` with `handleSubmitInquiry` that inserts into database, add name/email state, pass to ReviewStep |
+| `src/components/bundle-builder/StepProgress.tsx` | Change step 4 label from "Kosarba" to "Elkuldes" |
+| `src/components/bundle-builder/SizeStep.tsx` | Add 2 new bundle options (3x10ml, 3x50ml) with discount badges, update to 2x2 grid on desktop |
+| `src/components/bundle-builder/PerfumeStep.tsx` | Update MAX_SELECTIONS to include new bundle sizes (3x10ml = exactly 3, 3x50ml = exactly 3) |
+| `src/components/bundle-builder/ReviewStep.tsx` | Add name + email input fields, show discount line for bundle options, change button text to "Erdeklodes Bekuldese", remove cart-related UI |
+| `src/components/bundle-builder/SuccessStep.tsx` | Replace cart/checkout messaging with thank-you + discount promise, remove "Tovabb a fizeteshez" button |
 
-### Files unchanged:
-- `src/pages/Index.tsx` -- Section order remains the same (BundleBuilder is already the 3rd section after BestsellersSection)
-- `src/lib/shopify.ts` -- Existing product fetching and cart APIs are reused as-is
-- `src/stores/cartStore.ts` -- Existing cart store handles adding items
+### No changes to:
+- `src/pages/Index.tsx` -- section order stays the same
+- `src/stores/cartStore.ts` -- untouched, still used by other parts of the app
+- `src/components/CartDrawer.tsx` -- untouched
 
-### Data flow:
-- Step 1 selection determines which variant price to show per product in Step 2
-- Products are fetched via `useProducts()` which calls Shopify Storefront API
-- Each product's variants are filtered by the selected size option (matching `selectedOptions` where name = "Meret" and value = "5ml" / "10ml" / "15ml")
-- Adding to cart uses the existing `addItem` from the cart store with the correct `variantId`
+---
 
-### Animations:
-- `framer-motion` `AnimatePresence` for step transitions (slide direction based on forward/backward)
-- `motion.div` with `layoutId` for the progress indicator active state
-- Hover scale effects on product cards and size cards
-- Success step: spring animation on the checkmark icon
-
-### No new dependencies needed
-- All UI components (Popover, Button, Progress, etc.) already exist
-- `framer-motion` already installed
-- `useProducts` hook already available
-- Cart store already handles adding items
+## New Database Migration
+One migration to create the `bundle_inquiries` table with an anon-insert RLS policy.
