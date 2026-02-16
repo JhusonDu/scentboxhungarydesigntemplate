@@ -1,97 +1,80 @@
 
 
-# Hero Search Bar and Layout Redesign
+# Hero CTA Redesign with AI Perfume Finder
 
 ## Overview
-Move the search experience from the header toolbar into the Hero section, creating a prominent search bar that acts as the main call-to-action. Reorganize Hero buttons and remove the search icon from the header.
+Redesign the Hero section's action area into a polished three-part layout: a prominent search bar with an integrated "help me choose" link, two high-quality CTA buttons, and an enhanced AI-powered perfume finder inside the search dialog. The finder will use a guided questionnaire with smooth animations, then display curated results with rich product introductions.
 
 ---
 
-## 1. Remove Search Icon from Header
+## New Hero Layout (top to bottom)
 
-**File: `src/components/Header.tsx`**
-
-- Remove the Search icon button from the desktop actions area (lines 253-260)
-- Remove the mobile search icon button (lines 238-245)
-- Remove the search icon from the mobile menu footer (lines 145-155)
-- Keep the `SearchCommand` component and `isSearchOpen` state -- the Hero search bar will trigger it
-- Keep `Ctrl+K` / `Cmd+K` keyboard shortcut working
-- Keep User icon and Cart icon in the header
-
-**New desktop actions layout:**
 ```text
-[User icon] [Cart icon]
+[Search Bar with integrated "Nem tudom, mit keresek" link]
+[Primary CTA: Bongeszd az Illatokat]  [Secondary CTA: Allitsd Ossze a Dobozod]
+[Trust signals]
 ```
 
-**New mobile header layout:**
-```text
-[Hamburger] [Logo + "ScentBox Hungary"] [Cart icon]
-```
+### Search Bar Enhancements
+- Keep the current clickable fake-input design but make it taller (py-4) with a slightly stronger gold border glow
+- Below the search bar, add a small animated text link: **"Nem tudod, mit keresel? Segitunk megtalalni!"** with a Sparkles icon
+- Clicking this link opens the SearchCommand dialog directly on the **Finder tab** instead of the Search tab
+- The link has a subtle shimmer/pulse animation to draw attention
+
+### Two Main Buttons Side by Side
+- Both buttons rendered at equal width on desktop (side-by-side in a row)
+- On mobile, they stack vertically, both full-width
+- **Primary** ("Bongeszd az Illatokat"): Solid gold background, bold uppercase, arrow icon, hover glow animation
+- **Secondary** ("Allitsd Ossze a Dobozod"): Gold outline style, same height and text size as primary, hover fill animation
+- Both buttons get a subtle `framer-motion` scale-on-hover effect (`whileHover={{ scale: 1.02 }}`) and press effect (`whileTap={{ scale: 0.98 }}`)
 
 ---
 
-## 2. Add Search Bar to Hero Section
+## Enhanced SearchCommand Dialog
 
-**File: `src/components/Hero.tsx`**
+### Tab System
+Keep the existing two-tab design (Search / Finder) but improve the Finder tab:
 
-Restructure the Hero CTA area into three stacked elements:
+### Improved Finder ("Talald meg az illatodat")
+1. **Progress bar**: Animated segmented progress (already exists), add framer-motion `layoutId` transition when advancing
+2. **Question cards**: Each question slides in from the right with a `framer-motion` `AnimatePresence` transition (exit left, enter right)
+3. **Option buttons**: Grid of styled cards with hover border-glow effect; on selection, a brief gold flash/check animation before advancing
+4. **Results view**: After all 3 questions answered, show results with:
+   - A heading: "Neked ajanlott illatok"
+   - Each product card shows: image, title, vendor, price, and a **short description** (pulled from the Shopify product description, truncated to ~80 chars)
+   - A "Ujrakezdes" button to retake the quiz
 
-### New layout (top to bottom):
-1. **Search bar** -- a clickable fake input that opens the `SearchCommand` dialog
-2. **"Bongeszd az Illatokat"** button (primary CTA)
-3. **"Allitsd Ossze a Dobozod"** button (secondary CTA)
-
-### Search bar design:
-- A wide, styled container that looks like a search input but is actually a button
-- Contains a Search icon on the left and placeholder text: **"Milyen illatot keresnel?"** ("What scent are you looking for?")
-- On click, it opens the existing `SearchCommand` dialog (which has both Search and Finder tabs)
-- **Mobile**: spans the full width of the content area (matching the width from the first button's left edge to the second button's right edge)
-- **Desktop**: same max-width as the content area (~500-600px)
-- Styled with a semi-transparent background, border, and subtle glow to match the luxury aesthetic
-
-### Button reordering:
-- **"Bongeszd az Illatokat"** stays as the primary gold button
-- **"Allitsd Ossze a Dobozod"** moves below it (after the "100% Eredeti" text line)
-
-The Hero component will need to accept a callback or state setter to open the search. Since `SearchCommand` lives in `Header.tsx`, we will lift the search state up:
-- Move `isSearchOpen` and `setIsSearchOpen` into Index.tsx and pass them as props to both `Header` and `Hero`
-- Alternatively, keep it simpler: pass `onSearchOpen` callback from `Header` to `Hero` -- but since they are siblings, **lift state to Index.tsx**
+### Opening Directly to Finder Tab
+- Add an optional `initialTab` prop to `SearchCommand`: `initialTab?: "search" | "finder"`
+- When the Hero's "Nem tudod, mit keresel?" link is clicked, it opens the dialog with `initialTab="finder"`
+- When the search bar itself is clicked, it opens with `initialTab="search"` (default)
 
 ---
 
-## 3. State Management
+## Technical Changes
 
-**File: `src/pages/Index.tsx`**
+### File: `src/components/Hero.tsx`
+- Add a new `onFinderOpen` callback prop (or reuse `onSearchOpen` with a parameter)
+- Replace the single search bar + separated buttons layout with the new grouped layout
+- Add the "Nem tudod, mit keresel?" animated link below the search bar
+- Place both CTA buttons in a flex row (`flex-col sm:flex-row`) with equal sizing
+- Move trust signals below the buttons
+- Add `motion` hover/tap animations to both buttons
+- Remove the old separated secondary CTA block
 
-- Add `isSearchOpen` state here
-- Pass `isSearchOpen` and `setIsSearchOpen` (or `onSearchOpen`) to both `Header` and `Hero`
-- `Header` still renders the `SearchCommand` dialog and handles `Ctrl+K`
-- `Hero` calls `onSearchOpen()` when the fake search bar is clicked
+### File: `src/components/SearchCommand.tsx`
+- Add `initialTab` prop, default to `"search"`
+- Use `initialTab` in the `useEffect` that resets state when dialog opens
+- Add `AnimatePresence` + `motion.div` transitions for finder question steps (slide left/right)
+- Show product description snippet in finder results (already available from Shopify data as `p.description`)
+- Add a subtle entry animation for the results list
 
----
+### File: `src/pages/Index.tsx`
+- Add a new state or callback to support opening search with a specific tab
+- Pass the tab preference down to `Header` which renders `SearchCommand`
+- Two functions: `handleSearchOpen()` (opens search tab) and `handleFinderOpen()` (opens finder tab)
 
-## 4. Responsive Sizing
-
-### Mobile:
-- Search bar spans full width of the content container (`w-full`)
-- Both CTA buttons stack vertically below, also full width
-- All three elements align left-to-right edges
-
-### Desktop:
-- Search bar has a max-width matching the button group (~max-w-lg or similar)
-- Centered within the Hero content
-- Buttons remain side-by-side below the search bar
-
----
-
-## Technical Summary
-
-| File | Changes |
-|---|---|
-| `src/pages/Index.tsx` | Add `isSearchOpen` state, pass props to Header and Hero |
-| `src/components/Header.tsx` | Accept `isSearchOpen`/`onSearchOpenChange` props, remove all Search icon buttons |
-| `src/components/Hero.tsx` | Accept `onSearchOpen` prop, add clickable search bar above CTAs, move "Allitsd Ossze a Dobozod" below authenticity text |
-| `src/components/SearchCommand.tsx` | No changes needed |
-
-No new dependencies required.
+### No new dependencies
+- `framer-motion` already installed for `AnimatePresence` transitions
+- All UI components (`CommandDialog`, etc.) already available
 
