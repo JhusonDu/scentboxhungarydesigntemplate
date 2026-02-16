@@ -9,10 +9,10 @@ import logoIcon from "@/assets/logo-icon.png";
 import { SearchCommand } from "./SearchCommand";
 
 const navLinks = [
-  { label: "Kezdőlap", href: "/", isRoute: true },
-  { label: "Illatok", href: "/termekek", isRoute: true },
-  { label: "Rólunk", href: "#authenticity", isRoute: false },
-  { label: "Kapcsolat", href: "#footer", isRoute: false },
+  { label: "Kezdőlap", href: "/", isRoute: true, opensSearch: false },
+  { label: "Illatok", href: "#", isRoute: false, opensSearch: true },
+  { label: "Rólunk", href: "#authenticity", isRoute: false, opensSearch: false },
+  { label: "Kapcsolat", href: "#footer", isRoute: false, opensSearch: false },
 ];
 
 export const Header = () => {
@@ -90,7 +90,22 @@ export const Header = () => {
                 <nav className="flex-1 p-6">
                   <div className="space-y-2">
                     {navLinks.map((link, index) =>
-                      link.isRoute ? (
+                      link.opensSearch ? (
+                        <motion.button
+                          key={link.label}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            setIsSearchOpen(true);
+                          }}
+                          className="flex items-center px-4 py-3 text-lg font-medium text-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-all duration-300 group w-full text-left"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary/0 group-hover:bg-primary mr-3 transition-all duration-300" />
+                          {link.label}
+                        </motion.button>
+                      ) : link.isRoute ? (
                         <motion.div
                           key={link.label}
                           initial={{ opacity: 0, x: -20 }}
@@ -174,7 +189,19 @@ export const Header = () => {
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link, index) =>
-              link.isRoute ? (
+              link.opensSearch ? (
+                <motion.button
+                  key={link.label}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + index * 0.05 }}
+                  onClick={() => setIsSearchOpen(true)}
+                  className="relative px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:text-foreground group"
+                >
+                  {link.label}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-300 group-hover:w-3/4" />
+                </motion.button>
+              ) : link.isRoute ? (
                 <motion.div
                   key={link.label}
                   initial={{ opacity: 0, y: -10 }}
