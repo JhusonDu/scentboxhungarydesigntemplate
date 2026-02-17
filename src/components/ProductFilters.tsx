@@ -200,11 +200,12 @@ export const ProductFilters = ({
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetTrigger asChild>
           <motion.div
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40"
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="fixed bottom-8 left-0 right-0 z-40 flex justify-center pointer-events-none"
           >
-            <Button className="rounded-full px-6 h-12 shadow-xl gap-2" size="lg">
+            <Button className="rounded-full px-8 h-12 shadow-2xl gap-2 pointer-events-auto" size="lg">
               <SlidersHorizontal className="w-4 h-4" />
               Szűrő
               {activeCount > 0 && (
