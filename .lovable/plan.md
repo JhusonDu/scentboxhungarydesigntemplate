@@ -1,62 +1,65 @@
 
-# Footer Redesign + About Us & Support Pages
+# Products Page Redesign -- Premium Hero + Navigation
 
 ## Overview
 
-Completely redesign the footer inspired by the reference images, adapted to ScentBox's luxury perfume brand identity (dark obsidian background, gold accents). Also create dedicated "Rolunk" (About Us) and "Tamogatas" (Support) pages with proper routing and working links throughout.
+Redesign the Products page hero section and header navigation to be more welcoming, professional, and user-friendly. Inspired by the reference screenshot, we'll add breadcrumb navigation, a refined gold-accented background with subtle radial glow, and quick navigation links in the header for easier access.
 
-## Footer Redesign
+## Changes
 
-### Structure (top to bottom)
+### 1. Header -- Add Quick Navigation Links (Desktop)
 
-1. **CTA Banner** -- A full-width strip above the main footer: "Kerdesed van? Segitunk valasztani!" with a gold "Kapcsolatfelvetel" button linking to the Support page.
+Add inline navigation links between the logo and action icons on desktop for faster access to key pages:
 
-2. **Main Footer Grid** (5 columns desktop, stacked mobile):
-   - **Column 1 (brand, span 2)**: ScentBox logo + short description + contact info (email icon + email, location icon + "Budapest, Magyarorszag"), social media icons (Instagram, TikTok, Facebook)
-   - **Column 2 "Termekek"**: Osszes Termek (/termekek), Ferfi illatok (/termekek?gender=Ferfi), Noi illatok (/termekek?gender=Noi), Kedvenceink (#bestsellers)
-   - **Column 3 "Segitseg"**: Hogyan Rendeljek? (/tamogatas), Szallitasi Informaciok (/tamogatas), Fizetesi modok (/tamogatas), Visszakuldes (/tamogatas)
-   - **Column 4 "Ceg"**: Rolunk (/rolunk), Eredetiseg (#authenticity), Kapcsolat (/tamogatas)
+- **Termekek** (Products) -- link to `/termekek`
+- **Rolunk** (About Us) -- link to `/rolunk`
+- **Tamogatas** (Support) -- link to `/tamogatas`
 
-3. **Bottom Bar**: Copyright left, "Adatvedelem" + "ASZF" links right
+These links appear only on desktop (hidden on mobile where the Toolbox menu handles navigation). Styled with subtle hover effects -- gold underline animation on hover, muted foreground color by default.
 
-### Design Details
-- Dark background using `bg-obsidian` or `bg-[#0a0a0a]` for contrast from the rest of the site
-- Gold accent on hover states and CTA button
-- Trust row removed from footer (it already appears elsewhere on the page)
-- Smooth hover transitions on all links
-- Mobile: single column, sections collapsed with clear spacing
+### 2. Products Page Hero Redesign
 
-## New Pages
+Replace the current simple dark gradient hero with a more welcoming, luminous design:
 
-### About Us Page (`/rolunk`)
-- Hero section with brand story heading
-- "Kik Vagyunk" section -- short brand mission paragraph
-- "Miert ScentBox?" section -- 3-4 value cards (Eredetiseg, Preciz Dekantalas, Gyors Szallitas, Elegedettsegi Garancia)
-- Trust badges row
-- CTA to browse products
-- Uses Header + Footer layout
+**Background:**
+- Warm radial gradient: a soft gold glow from center fading into the dark background
+- Subtle shimmer/sparkle effect using CSS pseudo-elements
+- A faint decorative gold line accent on the left side of the heading (like the reference image's vertical bar)
 
-### Support Page (`/tamogatas`)
-- Hero with "Segitseg" heading
-- Tabbed or accordion FAQ sections:
-  - "Hogyan Rendeljek?" -- ordering steps
-  - "Szallitas" -- delivery info (GLS, 1-3 nap)
-  - "Fizetesi modok" -- payment methods (card, transfer)
-  - "Visszakuldes" -- 14-day return policy
-  - "Kapcsolat" -- email, response time
-- Uses Header + Footer layout
+**Breadcrumb Navigation:**
+- Add a breadcrumb row at the top of the hero: `Fooldal / Termekek`
+- "Fooldal" links back to `/` with gold hover color
+- Styled with small text, muted foreground, slash separator
 
-## Technical Details
+**Content Refinement:**
+- Keep the "Kollekcio" badge, title, description, and product count
+- Add staggered entrance animations for each element (badge, title, description, count) with slight delays
+- The vertical gold accent bar on the left of the title (inspired by reference)
 
-### Files to modify:
-1. **`src/components/Footer.tsx`** -- Complete rewrite with new structure, CTA banner, 5-col grid, contact info, social icons
-2. **`src/App.tsx`** -- Add routes for `/rolunk` and `/tamogatas`
-3. **`src/components/ToolboxPanel.tsx`** -- Update "Rolunk" tab links to point to `/rolunk`, "Szallitas es Visszakuldes" to `/tamogatas`, "Kapcsolat" to `/tamogatas`
+**Layout:**
+- Shift content to left-aligned (like reference) instead of centered, for a more editorial/professional feel
+- Increase top padding slightly for breathing room below the header
 
-### Files to create:
-1. **`src/pages/AboutUs.tsx`** -- About Us page with brand story, value cards
-2. **`src/pages/Support.tsx`** -- Support/FAQ page with accordion sections
+### 3. File Changes
 
-### Dependencies:
-- No new packages needed
-- Uses existing: `framer-motion`, `lucide-react`, `react-router-dom`, shadcn `Accordion`
+**`src/components/Header.tsx`:**
+- Add a `nav` element between logo and action icons
+- 3 NavLink items (Termekek, Rolunk, Tamogatas) with hover animations
+- Hidden on mobile (`hidden md:flex`)
+- Each link uses gold underline-on-hover effect
+
+**`src/pages/Products.tsx`:**
+- Add breadcrumb component (Fooldal > Termekek)
+- Redesign hero background with radial gold glow gradient
+- Left-align hero content with gold accent bar
+- Staggered framer-motion entrance animations
+- Slightly more generous padding
+
+### Technical Notes
+
+- No new dependencies required
+- Uses existing `framer-motion`, `react-router-dom`, Tailwind utilities
+- Breadcrumb is built inline (no new component needed -- just a simple flex row with Link elements)
+- Gold glow uses `radial-gradient` with `hsl(43 65% 52% / 0.06)` for a soft, welcoming warmth without being overwhelming
+- Header nav links use the existing `story-link` underline animation class from CSS utilities
+- All animations are subtle and intentional per the brand's motion principles
