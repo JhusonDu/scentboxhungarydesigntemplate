@@ -77,6 +77,24 @@ export const Header = ({ isSearchOpen: externalOpen, onSearchOpenChange, searchI
             </span>
           </Link>
 
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 ml-10">
+            {[
+              { to: "/termekek", label: "Termékek" },
+              { to: "/rolunk", label: "Rólunk" },
+              { to: "/tamogatas", label: "Támogatás" },
+            ].map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="relative text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-300 group/nav"
+              >
+                {link.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary transition-all duration-300 group-hover/nav:w-full" />
+              </Link>
+            ))}
+          </nav>
+
           {/* Actions: Login + Cart + Settings */}
           <div className="flex items-center gap-1 md:gap-2">
             <motion.div
