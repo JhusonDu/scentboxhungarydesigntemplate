@@ -8,63 +8,51 @@ import heroVault from "@/assets/hero-vault.jpg";
 
 const values = [
   {
-    icon: ShieldCheck,
-    title: "Eredetiség Mindenekelőtt",
+    icon: Heart,
+    title: "A Vásárló az Első",
     description:
-      "Kizárólag hivatalos forgalmazóktól származó, ellenőrzött eredeti parfümöket kínálunk. Soha nem árusítunk hamisítványokat.",
+      "Nálunk a vásárlónak mindig igaza van. Ez nem szlogen — ez a szabályunk. Minden döntésünket a vásárlóink elégedettsége vezérli.",
   },
   {
-    icon: Heart,
-    title: "Szenvedély az Illatokért",
+    icon: ShieldCheck,
+    title: "Tisztességes Árak",
     description:
-      "Csapatunk minden tagja illatrajongó. A parfümök iránti szenvedélyünk minden döntésünkben tükröződik.",
+      "Nem dolgozunk magas árrésekkel. A legjobb piaci árakat adjuk, mert mi is tudjuk, mennyibe kerülhet egy parfüm.",
   },
   {
     icon: Star,
-    title: "Kiváló Minőség",
+    title: "Eredetiség Garantálva",
     description:
-      "A dekantálástól a csomagolásig minden lépésnél a legmagasabb minőségi sztenderdeket követjük.",
+      "Kizárólag eredeti, ellenőrzött termékeket árulunk. Soha nem kötünk kompromisszumot a minőségben.",
   },
 ];
 
 const milestones = [
   {
-    year: "2020",
+    year: "2024",
+    title: "Az Ötlet",
+    description:
+      "Megszületett az ötlet: prémium parfümöket tisztességes áron, magas árrések nélkül. Piackutatás, tervezés — csendben építkeztünk a háttérben.",
+  },
+  {
+    year: "2025",
     title: "Az Indulás",
     description:
-      "Egy budapesti lakásból indultunk el azzal az ötlettel, hogy a luxus parfümöket mindenki számára elérhetővé tegyük dekantálás segítségével.",
+      "A ScentBox Hungary végre a világ elé állt. Elindítottuk webáruházunkat, megérkeztek az első vásárlóink, és bebizonyítottuk, hogy a prémium nem jelent lehúzást.",
   },
   {
-    year: "2021",
-    title: "Növekedés",
+    year: "Hamarosan",
+    title: "Dekant Szolgáltatás",
     description:
-      "Kínálatunkat 50-ről több mint 200 illatra bővítettük, és kialakítottuk professzionális dekantáló műhelyünket.",
-  },
-  {
-    year: "2022",
-    title: "Expanzió",
-    description:
-      "Elindítottuk webáruházunkat és országos szállítást vezettünk be GLS futárszolgálattal.",
-  },
-  {
-    year: "2023",
-    title: "Elismerés",
-    description:
-      "Több mint 5000 elégedett vásárlóval a hátunk mögött, Magyarország egyik vezető dekant szolgáltatójává váltunk.",
-  },
-  {
-    year: "2024",
-    title: "A Jövő",
-    description:
-      "Folyamatosan bővülő kínálat, exkluzív kollekciók és új szolgáltatások — a legjobb még hátravan.",
+      "Kísérletezünk a dekantálással, hogy a legdrágább parfümöket is mindenki számára elérhetővé tegyük. Hamarosan érkezik!",
   },
 ];
 
 const qualityPoints = [
-  "Kizárólag hivatalos forgalmazóktól",
-  "Minden termék eredetiség-ellenőrzött",
-  "Precíz dekantálás steril környezetben",
-  "Luxus üvegek és címkézés",
+  "Kizárólag eredeti parfümök",
+  "A piac legjobb árai, magas árrés nélkül",
+  "Gyors és megbízható szállítás",
+  "A vásárló elégedettsége az első",
 ];
 
 const fadeUp = {
@@ -112,7 +100,7 @@ const AboutUs = () => {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="mt-6 text-lg md:text-xl text-muted-foreground leading-relaxed max-w-[700px] mx-auto"
           >
-            Prémium parfümök, autentikus élmények — 100% eredetiség garantálva.
+            Prémium parfümök, tisztességes áron — mert nálunk a vásárló számít.
           </motion.p>
         </div>
       </section>
@@ -145,15 +133,16 @@ const AboutUs = () => {
               </h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  A ScentBox Hungary 2020-ban indult azzal a céllal, hogy a luxus parfümök
-                  világát mindenki számára elérhetővé tegye. Hisszük, hogy egy kiváló illat
-                  nem luxus — hanem önkifejezés.
+                  A ScentBox Hungary 2024-ben indult azzal a felismeréssel, hogy a parfümök
+                  piaca sokszor túlárazott. Mi is tudjuk, mennyibe kerülhet egy jó illat —
+                  ezért döntöttünk úgy, hogy másképp csináljuk. Nem dolgozunk magas
+                  árrésekkel, mert a célunk nem a profit maximalizálása, hanem az, hogy a
+                  legjobb árakat adjuk a piacon.
                 </p>
                 <p>
-                  Dekant szolgáltatásunk lehetővé teszi, hogy megismerd a világ legjobb
-                  parfümházainak alkotásait anélkül, hogy teljes árat kellene fizetned egy
-                  üvegért. Minden dekantálás professzionális eszközökkel, steril környezetben
-                  történik.
+                  A háttérben csendben építkeztünk, és most itt vagyunk. Hamarosan dekant
+                  szolgáltatásunkkal a legdrágább parfümöket is mindenki számára elérhetővé
+                  tesszük. Nálunk a vásárló számít — ez nem szlogen, ez a szabályunk.
                 </p>
               </div>
             </motion.div>
@@ -286,8 +275,8 @@ const AboutUs = () => {
                 100% Eredeti Garantált
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                A ScentBox Hungary garantálja, hogy minden termékünk eredeti. Nincs
-                utánzat, nincs hamisítvány — soha.
+              A ScentBox Hungary garantálja, hogy minden termékünk eredeti, és az
+                áraink a piac legjobbjai. Nincs lehúzás, nincs túlárazás — soha.
               </p>
               <ul className="space-y-3">
                 {qualityPoints.map((point) => (
@@ -318,7 +307,7 @@ const AboutUs = () => {
               Fedezd Fel Kínálatunkat
             </motion.h2>
             <motion.p variants={fadeUp} className="text-muted-foreground mb-8">
-              Több mint 500 prémium parfüm várja felfedezésedet.
+              Prémium parfümök, tisztességes áron.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="rounded-full px-10">
