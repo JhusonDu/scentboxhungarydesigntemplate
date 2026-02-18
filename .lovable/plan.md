@@ -1,29 +1,33 @@
 
-# Rólunk Oldal Hero Szekció Kompaktálása
+# BrandIntroSection Kompaktálása (Főoldal)
 
-## Mi Változik
+## Fájl: `src/components/BrandIntroSection.tsx`
 
-Kizárólag a Rólunk oldal hero szekciója lesz kisebb és tömörebb, hogy az oldal betöltésekor a következő szekció teteje is látható legyen görgetés nélkül.
+### Változások
 
-## Változások Részletesen
+**1. Szekció padding csökkentése (35. sor)**
+- `py-12 md:py-16` --> `py-10 md:py-[60px]`
 
-### Fájl: `src/pages/AboutUs.tsx` (75-107. sorok)
+**2. Fejléc blokk margin csökkentése (39. sor)**
+- `mb-10 md:mb-12` --> `mb-8`
 
-**1. Szekció magasság csökkentése**
-- `min-h-[50vh] md:min-h-[60vh]` --> `min-h-[35vh] md:min-h-[40vh]`
+**3. Fejléc cím méret (46. sor)**
+- `text-2xl md:text-4xl` --> `text-2xl md:text-[32px]`
 
-**2. Belső padding csökkentése**
-- `py-20` --> `py-[30px] md:py-10`
+**4. Kártya rács gap és margin (56. sor)**
+- `gap-5 md:gap-6 ... mb-8 md:mb-10` --> `gap-6 ... mb-8`
 
-**3. Badge margin**
-- `mb-6` --> `mb-4`
+**5. Kártya belső padding (65. sor)**
+- `p-6 md:p-7` --> `p-[30px]`
 
-**4. Cím font-size**
-- `text-5xl md:text-6xl` --> `text-[32px] md:text-[44px]`
+**6. Ikon méret (67. sor)**
+- `w-10 h-10` konténer + `w-5 h-5` ikon --> `w-12 h-12` konténer + `w-6 h-6` ikon
 
-**5. Alcím**
-- `mt-6 text-lg md:text-xl ... max-w-[700px]` --> `mt-4 text-base md:text-lg ... max-w-[600px] leading-relaxed`
+**7. Kártya cím font-size (70. sor)**
+- `text-base md:text-lg` --> `text-[20px]`
 
-### Ami NEM változik:
-- Animációk, arany glow, gradient, badge stílus, szövegek tartalma
-- Az oldal többi szekciója érintetlen marad
+**8. Kártya leírás font-size (71. sor)**
+- `text-xs md:text-sm` --> `text-[14px]`
+
+### Ami NEM változik
+- Animációk, szövegek tartalma, CTA gomb, badge stílus, színek
