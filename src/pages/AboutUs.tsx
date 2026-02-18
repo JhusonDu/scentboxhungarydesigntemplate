@@ -72,18 +72,18 @@ const AboutUs = () => {
       <Header />
 
       {/* 1. Hero */}
-      <section className="relative min-h-[50vh] md:min-h-[60vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[35vh] md:min-h-[40vh] flex items-center justify-center overflow-hidden">
         {/* Gold radial glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/[0.07] blur-[120px]" />
         </div>
 
-        <div className="container relative z-10 text-center max-w-3xl mx-auto py-20">
+        <div className="container relative z-10 text-center max-w-3xl mx-auto py-[30px] md:py-10">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="badge-gold inline-block mb-6"
+            className="badge-gold inline-block mb-4"
           >
             RÓLUNK
           </motion.span>
@@ -91,7 +91,7 @@ const AboutUs = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.6 }}
-            className="text-5xl md:text-6xl font-display text-foreground leading-tight"
+            className="text-[32px] md:text-[44px] font-display text-foreground leading-tight"
           >
             A ScentBox Hungary Története
           </motion.h1>
@@ -99,7 +99,7 @@ const AboutUs = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="mt-6 text-lg md:text-xl text-muted-foreground leading-relaxed max-w-[700px] mx-auto"
+            className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed max-w-[600px] mx-auto"
           >
             Prémium parfümök, tisztességes áron — mert nálunk a vásárló számít.
           </motion.p>
