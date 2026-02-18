@@ -1,33 +1,34 @@
 
-# BrandIntroSection Kompaktálása (Főoldal)
+# Bemutatkozó Szekció a Főoldalra -- Hero és Termékek Között
 
-## Fájl: `src/components/BrandIntroSection.tsx`
+## Cél
 
-### Változások
+Egy kompakt, professzionális "Ki vagyunk?" blokk közvetlenül a Hero szekció alatt és a FeaturedProducts felett, amely azonnal bemutatkozik az új látogatóknak: 100% eredeti termékek, minősített magyar forgalmazó, kedvező árak, vásárlóközpontúság.
 
-**1. Szekció padding csökkentése (35. sor)**
-- `py-12 md:py-16` --> `py-10 md:py-[60px]`
+## Design
 
-**2. Fejléc blokk margin csökkentése (39. sor)**
-- `mb-10 md:mb-12` --> `mb-8`
+- **Háttér**: `noise-texture` osztály (sötét, finom textúra -- ugyanaz, mint a Rólunk oldalon)
+- **Elrendezés**: Középre igazított szöveges blokk + alatta 3 kompakt kiemelő kártya (ikon + cím + 1 mondat)
+- **Badge**: `badge-gold` -- "MIÉRT MINKET?"
+- **Cím**: Playfair Display (`font-display`), pl. "Prémium Parfümök, Tisztességes Áron"
+- **Alcím**: 2-3 mondat a márka lényegéről (eredeti termékek, legjobb árak, vásárló az első)
+- **3 kiemelő kártya** (ikonnal):
+  1. **100% Eredeti** (`ShieldCheck`) -- Minősített magyarországi hivatalos forgalmazótól
+  2. **Legjobb Árak** (`Tag`) -- 20-40%-kal kedvezőbb, mert nem dolgozunk magas árrésekkel
+  3. **Vásárló az Első** (`Heart`) -- Kiváló ügyfélszolgálat, megbízható szállítás
+- **"Rólunk" link gomb**: Outline stílusú gomb, ami a `/rolunk` oldalra visz
+- **Animáció**: `framer-motion` `whileInView` fade-up, staggered kártyák
 
-**3. Fejléc cím méret (46. sor)**
-- `text-2xl md:text-4xl` --> `text-2xl md:text-[32px]`
+## Technikai Részletek
 
-**4. Kártya rács gap és margin (56. sor)**
-- `gap-5 md:gap-6 ... mb-8 md:mb-10` --> `gap-6 ... mb-8`
+### Új fájl:
+- **`src/components/BrandIntroSection.tsx`** -- Önálló komponens a bemutatkozó szekcióhoz
 
-**5. Kártya belső padding (65. sor)**
-- `p-6 md:p-7` --> `p-[30px]`
+### Módosított fájl:
+- **`src/pages/Index.tsx`** -- Import + a komponens beillesztése a `<Hero />` és `<FeaturedProducts />` közé
 
-**6. Ikon méret (67. sor)**
-- `w-10 h-10` konténer + `w-5 h-5` ikon --> `w-12 h-12` konténer + `w-6 h-6` ikon
-
-**7. Kártya cím font-size (70. sor)**
-- `text-base md:text-lg` --> `text-[20px]`
-
-**8. Kártya leírás font-size (71. sor)**
-- `text-xs md:text-sm` --> `text-[14px]`
-
-### Ami NEM változik
-- Animációk, szövegek tartalma, CTA gomb, badge stílus, színek
+### Felhasznált minták:
+- `badge-gold`, `noise-texture` -- meglévő CSS utility-k
+- `framer-motion` -- `whileInView` animáció
+- `lucide-react` -- `ShieldCheck`, `Tag`, `Heart` ikonok
+- `Link` (`react-router-dom`) -- "/rolunk" oldalra navigáció
