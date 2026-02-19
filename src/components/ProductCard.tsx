@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { ShoppingBag, Plus } from "lucide-react";
 import { ShopifyProduct } from "@/lib/shopify";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { extractConcentration } from "@/lib/perfumeUtils";
 
 interface ProductCardProps {
   product: ShopifyProduct;
@@ -117,6 +118,16 @@ export const ProductCard = ({ product, index = 0, onQuickBuy }: ProductCardProps
             </button>
           )}
         </div>
+
+        {/* Concentration badge */}
+        {(() => {
+          const { concentration } = extractConcentration(node.title);
+          return concentration ? (
+            <div className="absolute top-3 right-3 px-2.5 py-0.5 bg-background/80 backdrop-blur-sm text-[10px] font-semibold text-primary border border-primary/20 rounded-full shadow-[0_0_8px_hsl(var(--primary)/0.15)]">
+              {concentration}
+            </div>
+          ) : null;
+        })()}
 
         {/* Stock badge */}
         {!firstVariant?.availableForSale && (

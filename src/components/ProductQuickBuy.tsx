@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCartStore } from "@/stores/cartStore";
 import { ShopifyProduct } from "@/lib/shopify";
+import { extractConcentration, groupProductsByBaseName } from "@/lib/perfumeUtils";
 
 const formatPrice = (amount: string, currency: string) => {
   const n = parseFloat(amount);
@@ -21,19 +22,53 @@ const formatPrice = (amount: string, currency: string) => {
 
 interface Props {
   product: ShopifyProduct | null;
+  allProducts?: ShopifyProduct[];
   onClose: () => void;
 }
 
-export const ProductQuickBuy = ({ product, onClose }: Props) => {
+export const ProductQuickBuy = ({ product, allProducts = [], onClose }: Props) => {
   const addItem = useCartStore((s) => s.addItem);
   const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
   const isLoading = useCartStore((s) => s.isLoading);
 
-  const variants = product?.node.variants?.edges ?? [];
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [activeConcentration, setActiveConcentration] = useState<string | null>(null);
 
-  const node = product?.node;
+  // Extract concentration info for the selected product
+  const productInfo = useMemo(() => {
+    if (!product) return null;
+    return extractConcentration(product.node.title);
+  }, [product?.node.title]);
+
+  // Group related products by base name
+  const relatedGroup = useMemo(() => {
+    if (!product || allProducts.length === 0) return [];
+    const groups = groupProductsByBaseName(allProducts);
+    const key = productInfo?.baseName.toLowerCase() ?? "";
+    return groups.get(key) ?? [];
+  }, [product, allProducts, productInfo]);
+
+  const concentrationTabs = useMemo(() => {
+    return relatedGroup
+      .filter((g) => g.info.concentration)
+      .sort((a, b) => {
+        const order = ["EDT", "EDP", "Parfum", "Extrait", "Intense"];
+        return order.indexOf(a.info.concentration!) - order.indexOf(b.info.concentration!);
+      });
+  }, [relatedGroup]);
+
+  const hasMultipleConcentrations = concentrationTabs.length > 1;
+
+  // Determine the active product (may switch via concentration tabs)
+  const activeProduct = useMemo(() => {
+    if (!hasMultipleConcentrations || !activeConcentration) return product;
+    const found = concentrationTabs.find((t) => t.info.concentration === activeConcentration);
+    return found?.product ?? product;
+  }, [hasMultipleConcentrations, activeConcentration, concentrationTabs, product]);
+
+  const node = activeProduct?.node;
+  const variants = node?.variants?.edges ?? [];
   const image = node?.images?.edges?.[0]?.node;
   const selectedVariant = variants[selectedIdx]?.node;
   const price = selectedVariant?.price ?? node?.priceRange?.minVariantPrice ?? { amount: "0", currencyCode: "HUF" };
@@ -44,17 +79,32 @@ export const ProductQuickBuy = ({ product, onClose }: Props) => {
     return (unitPrice * quantity).toString();
   }, [price.amount, quantity]);
 
+  // Reset state when product changes
   useEffect(() => {
     setSelectedIdx(0);
     setQuantity(1);
+    if (productInfo?.concentration) {
+      setActiveConcentration(productInfo.concentration);
+    } else {
+      setActiveConcentration(null);
+    }
   }, [product?.node.id]);
+
+  // Reset variant index when concentration tab changes
+  useEffect(() => {
+    setSelectedIdx(0);
+    setQuantity(1);
+  }, [activeConcentration]);
 
   if (!product || !node) return null;
 
+  const displayName = productInfo?.baseName ?? node.title;
+  const singleConcentration = !hasMultipleConcentrations ? productInfo?.concentration : null;
+
   const handleAdd = async () => {
-    if (!selectedVariant) return;
+    if (!selectedVariant || !activeProduct) return;
     await addItem({
-      product,
+      product: activeProduct,
       variantId: selectedVariant.id,
       variantTitle: selectedVariant.title,
       price: selectedVariant.price,
@@ -66,9 +116,9 @@ export const ProductQuickBuy = ({ product, onClose }: Props) => {
   };
 
   const handleBuyNow = async () => {
-    if (!selectedVariant) return;
+    if (!selectedVariant || !activeProduct) return;
     await addItem({
-      product,
+      product: activeProduct,
       variantId: selectedVariant.id,
       variantTitle: selectedVariant.title,
       price: selectedVariant.price,
@@ -116,14 +166,19 @@ export const ProductQuickBuy = ({ product, onClose }: Props) => {
                   {node.vendor}
                 </span>
               )}
-              <DialogTitle className="text-base font-display font-semibold leading-snug text-foreground">
-                {node.title}
+              <DialogTitle className="text-base font-display font-semibold leading-snug text-foreground flex items-center gap-2">
+                {displayName}
+                {singleConcentration && (
+                  <span className="inline-flex px-2 py-0.5 text-[10px] font-semibold text-primary bg-primary/10 border border-primary/20 rounded-full">
+                    {singleConcentration}
+                  </span>
+                )}
               </DialogTitle>
               <DialogDescription asChild>
                 <div className="flex items-center gap-2">
                   <AnimatePresence mode="wait">
                     <motion.span
-                      key={price.amount}
+                      key={price.amount + (activeConcentration ?? "")}
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -6 }}
@@ -148,6 +203,43 @@ export const ProductQuickBuy = ({ product, onClose }: Props) => {
           </div>
 
           <div className="px-5 pb-5 space-y-4">
+            {/* Concentration tabs */}
+            {hasMultipleConcentrations && (
+              <div>
+                <p className="text-[11px] text-muted-foreground mb-2.5 uppercase tracking-[0.15em] font-medium">
+                  Koncentráció
+                </p>
+                <div className="flex gap-1.5 p-1 bg-secondary/50 rounded-xl">
+                  {concentrationTabs.map((tab, i) => {
+                    const isActive = activeConcentration === tab.info.concentration;
+                    return (
+                      <motion.button
+                        key={tab.info.concentration}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05, duration: 0.2 }}
+                        onClick={() => setActiveConcentration(tab.info.concentration)}
+                        className={`relative flex-1 text-sm py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                          isActive
+                            ? "text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {isActive && (
+                          <motion.div
+                            layoutId="concentration-tab-bg"
+                            className="absolute inset-0 bg-primary rounded-lg shadow-[0_0_12px_hsl(var(--primary)/0.3)]"
+                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                          />
+                        )}
+                        <span className="relative z-10">{tab.info.concentration}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Variant selector */}
             {variants.length > 1 && (
               <div>
@@ -155,26 +247,37 @@ export const ProductQuickBuy = ({ product, onClose }: Props) => {
                   Méret
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {variants.map((v, i) => (
-                    <motion.button
-                      key={v.node.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: i * 0.04, duration: 0.2 }}
-                      onClick={() => setSelectedIdx(i)}
-                      disabled={!v.node.availableForSale}
-                      className={`text-sm px-4 py-2 rounded-full border transition-all duration-250 flex flex-col items-center leading-tight ${
-                        selectedIdx === i
-                          ? "border-primary bg-primary/15 text-primary shadow-[0_0_10px_hsl(var(--primary)/0.25)] font-semibold"
-                          : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
-                      } disabled:opacity-30 disabled:cursor-not-allowed`}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeConcentration ?? "default"}
+                      initial={{ opacity: 0, x: 8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -8 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex flex-wrap gap-2"
                     >
-                      <span>{variantLabel(v.node)}</span>
-                      <span className={`text-[10px] ${selectedIdx === i ? "text-primary/70" : "text-muted-foreground/60"}`}>
-                        {formatPrice(v.node.price.amount, v.node.price.currencyCode)}
-                      </span>
-                    </motion.button>
-                  ))}
+                      {variants.map((v, i) => (
+                        <motion.button
+                          key={v.node.id}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: i * 0.04, duration: 0.2 }}
+                          onClick={() => setSelectedIdx(i)}
+                          disabled={!v.node.availableForSale}
+                          className={`text-sm px-4 py-2 rounded-full border transition-all duration-250 flex flex-col items-center leading-tight ${
+                            selectedIdx === i
+                              ? "border-primary bg-primary/15 text-primary shadow-[0_0_10px_hsl(var(--primary)/0.25)] font-semibold"
+                              : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+                          } disabled:opacity-30 disabled:cursor-not-allowed`}
+                        >
+                          <span>{variantLabel(v.node)}</span>
+                          <span className={`text-[10px] ${selectedIdx === i ? "text-primary/70" : "text-muted-foreground/60"}`}>
+                            {formatPrice(v.node.price.amount, v.node.price.currencyCode)}
+                          </span>
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
               </div>
             )}

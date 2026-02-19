@@ -104,7 +104,7 @@ export const ProductGrid = ({ filters, onClearFilters }: ProductGridProps) => {
           ))}
         </AnimatePresence>
       </motion.div>
-      <ProductQuickBuy product={quickBuyProduct} onClose={() => setQuickBuyProduct(null)} />
+      <ProductQuickBuy product={quickBuyProduct} allProducts={products} onClose={() => setQuickBuyProduct(null)} />
     </>
   );
 };
