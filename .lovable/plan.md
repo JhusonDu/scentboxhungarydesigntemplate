@@ -1,39 +1,34 @@
 
-# Header (Toolbar) Ujratervezes
+# Bemutatkozó Szekció a Főoldalra -- Hero és Termékek Között
 
-## Mi valtozik
-Kizarolag a `Header.tsx` komponens kerul ujraepitesre. Minden mas (oldalak, szekciok, ToolboxPanel, CartDrawer, LoginDialog, SearchCommand) valtozatlan marad.
+## Cél
 
-## Uj Header Design
+Egy kompakt, professzionális "Ki vagyunk?" blokk közvetlenül a Hero szekció alatt és a FeaturedProducts felett, amely azonnal bemutatkozik az új látogatóknak: 100% eredeti termékek, minősített magyar forgalmazó, kedvező árak, vásárlóközpontúság.
 
-### Asztali nezet (md+)
-- **Bal oldal**: Logo ikon + "ScentBox Hungary" -- valtozatlan pozicio es stilus
-- **Kozep**: Navigacios linkek kozepre igazitva (`flex-1 justify-center`): Termekek, Rolunk, Segitseg -- arany underline hover animacioval es `framer-motion` staggered fade-in-nel
-- **Jobb oldal**: Felhasznalo ikon, Kosar ikon, Menu (hamburger) ikon -- mint eddig, de finomabb hover glow effekttel
+## Design
 
-### Mobil nezet (< md)
-- **Bal oldal**: Logo ikon + "ScentBox" (rovid nev, mint eddig)
-- **Kozep**: Ures (linkek elrejtve, a Menu panelbol erheto el)
-- **Jobb oldal**: Felhasznalo, Kosar, Menu ikonok kompaktan
+- **Háttér**: `noise-texture` osztály (sötét, finom textúra -- ugyanaz, mint a Rólunk oldalon)
+- **Elrendezés**: Középre igazított szöveges blokk + alatta 3 kompakt kiemelő kártya (ikon + cím + 1 mondat)
+- **Badge**: `badge-gold` -- "MIÉRT MINKET?"
+- **Cím**: Playfair Display (`font-display`), pl. "Prémium Parfümök, Tisztességes Áron"
+- **Alcím**: 2-3 mondat a márka lényegéről (eredeti termékek, legjobb árak, vásárló az első)
+- **3 kiemelő kártya** (ikonnal):
+  1. **100% Eredeti** (`ShieldCheck`) -- Minősített magyarországi hivatalos forgalmazótól
+  2. **Legjobb Árak** (`Tag`) -- 20-40%-kal kedvezőbb, mert nem dolgozunk magas árrésekkel
+  3. **Vásárló az Első** (`Heart`) -- Kiváló ügyfélszolgálat, megbízható szállítás
+- **"Rólunk" link gomb**: Outline stílusú gomb, ami a `/rolunk` oldalra visz
+- **Animáció**: `framer-motion` `whileInView` fade-up, staggered kártyák
 
-### Animaciok
-- Header beuszas: `motion.header` y:-100 -> 0 (meglevo)
-- Nav linkek: staggered `motion.div` fade-in + slide-up kulon-kulon
-- Hover: Arany underline animacio (`scaleX(0) -> scaleX(1)`) es finom `text-primary` szin atmenet
-- Ikonok: `whileHover={{ scale: 1.1 }}` es `whileTap={{ scale: 0.95 }}` spring animacio
-- Scroll allapot: Meglevo backdrop-blur + also arany gradient vonal
+## Technikai Részletek
 
-### Scroll viselkedes
-Valtozatlan: scroll > 20px eseten `bg-background/95 backdrop-blur-xl` hatter, arany also hatarvonal AnimatePresence-szel.
+### Új fájl:
+- **`src/components/BrandIntroSection.tsx`** -- Önálló komponens a bemutatkozó szekcióhoz
 
-## Technikai Reszletek
+### Módosított fájl:
+- **`src/pages/Index.tsx`** -- Import + a komponens beillesztése a `<Hero />` és `<FeaturedProducts />` közé
 
-### Modositott fajl
-- **`src/components/Header.tsx`** -- A navigacios linkek elrendezese: `flex-1 justify-center` a kozepre igazitashoz. Az ikonok `whileHover` / `whileTap` animaciokat kapnak. Staggered link animaciok `motion.div` wrapper-ekkel. Az aktiv link jelzese a `useLocation()` hook-kal tortenik (arany also vonal az aktiv oldalon).
-
-### Nem valtozo fajlok
-- `ToolboxPanel.tsx` -- valtozatlan
-- `CartDrawer.tsx` -- valtozatlan
-- `LoginDialog.tsx` -- valtozatlan
-- `SearchCommand.tsx` -- valtozatlan
-- Osszes oldal es szekció -- valtozatlan
+### Felhasznált minták:
+- `badge-gold`, `noise-texture` -- meglévő CSS utility-k
+- `framer-motion` -- `whileInView` animáció
+- `lucide-react` -- `ShieldCheck`, `Tag`, `Heart` ikonok
+- `Link` (`react-router-dom`) -- "/rolunk" oldalra navigáció

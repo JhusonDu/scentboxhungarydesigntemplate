@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
 import { Menu, User } from "lucide-react";
 import { Button } from "./ui/button";
@@ -15,28 +15,24 @@ interface HeaderProps {
   searchInitialTab?: "search" | "finder";
 }
 
-const navLinks = [
-  { to: "/termekek", label: "Termékek" },
-  { to: "/rolunk", label: "Rólunk" },
-  { to: "/tamogatas", label: "Segítség" },
-];
-
 export const Header = ({ isSearchOpen: externalOpen, onSearchOpenChange, searchInitialTab = "search" }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isToolboxOpen, setIsToolboxOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [internalOpen, setInternalOpen] = useState(false);
-  const location = useLocation();
 
   const isSearchOpen = externalOpen ?? internalOpen;
   const setIsSearchOpen = onSearchOpenChange ?? setInternalOpen;
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Ctrl+K / Cmd+K keyboard shortcut
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -60,9 +56,9 @@ export const Header = ({ isSearchOpen: externalOpen, onSearchOpenChange, searchI
             : "bg-gradient-to-b from-background/90 md:from-background/80 to-transparent"
         }`}
       >
-        <div className="container flex h-14 md:h-20 items-center">
-          {/* Logo - Left */}
-          <Link to="/" className="flex items-center gap-2 md:gap-3 group shrink-0">
+        <div className="container flex h-14 md:h-20 items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 md:gap-3 group">
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
@@ -81,58 +77,39 @@ export const Header = ({ isSearchOpen: externalOpen, onSearchOpenChange, searchI
             </span>
           </Link>
 
-          {/* Navigation - Center (desktop only) */}
-          <nav className="hidden md:flex flex-1 items-center justify-center gap-10">
-            {navLinks.map((link, i) => {
-              const isActive = location.pathname === link.to;
-              return (
-                <motion.div
-                  key={link.to}
-                  initial={{ opacity: 0, y: -12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 + i * 0.08, duration: 0.4, ease: "easeOut" }}
-                >
-                  <Link
-                    to={link.to}
-                    className="relative py-1 text-sm font-medium tracking-wide transition-colors duration-300 group/nav"
-                    style={{ color: isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}
-                  >
-                    <span className="group-hover/nav:text-primary transition-colors duration-300">
-                      {link.label}
-                    </span>
-                    {/* Animated underline */}
-                    <motion.span
-                      className="absolute -bottom-1 left-0 right-0 h-[2px] bg-primary origin-left"
-                      initial={false}
-                      animate={{ scaleX: isActive ? 1 : 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      style={{ transformOrigin: "left" }}
-                    />
-                    {/* Hover underline */}
-                    <span className="absolute -bottom-1 left-0 right-0 h-[2px] bg-primary/40 scale-x-0 group-hover/nav:scale-x-100 transition-transform duration-300 origin-left" />
-                  </Link>
-                </motion.div>
-              );
-            })}
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 ml-10">
+            {[
+              { to: "/termekek", label: "Termékek" },
+              { to: "/rolunk", label: "Rólunk" },
+              { to: "/tamogatas", label: "Segítség" },
+            ].map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="relative text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-300 group/nav"
+              >
+                {link.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary transition-all duration-300 group-hover/nav:w-full" />
+              </Link>
+            ))}
           </nav>
 
-          {/* Actions - Right */}
-          <div className="flex items-center gap-1 md:gap-2 ml-auto md:ml-0 shrink-0">
+          {/* Actions: Login + Cart + Settings */}
+          <div className="flex items-center gap-1 md:gap-2">
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} transition={{ type: "spring", stiffness: 400, damping: 17 }}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsLoginOpen(true)}
-                  className="text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-all duration-300"
-                >
-                  <User className="h-5 w-5" />
-                </Button>
-              </motion.div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsLoginOpen(true)}
+                className="text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-all duration-300"
+              >
+                <User className="h-5 w-5" />
+              </Button>
             </motion.div>
 
             <motion.div
@@ -140,9 +117,7 @@ export const Header = ({ isSearchOpen: externalOpen, onSearchOpenChange, searchI
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} transition={{ type: "spring", stiffness: 400, damping: 17 }}>
-                <CartDrawer />
-              </motion.div>
+              <CartDrawer />
             </motion.div>
 
             <motion.div
@@ -150,16 +125,14 @@ export const Header = ({ isSearchOpen: externalOpen, onSearchOpenChange, searchI
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} transition={{ type: "spring", stiffness: 400, damping: 17 }}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsToolboxOpen(true)}
-                  className="text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-all duration-300"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </motion.div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsToolboxOpen(true)}
+                className="text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-all duration-300"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
             </motion.div>
           </div>
         </div>
