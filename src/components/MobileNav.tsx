@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight, ChevronDown, Phone, Mail } from "lucide-react";
@@ -29,29 +29,34 @@ const backdropVariants = {
 };
 
 const panelVariants = {
-  hidden: { x: "100%" },
-  visible: { x: 0, transition: { type: "tween" as const, duration: 0.3, ease: [0.4, 0, 0.2, 1] as const } },
-  exit: { x: "100%", transition: { type: "tween" as const, duration: 0.3, ease: [0.4, 0, 0.2, 1] as const } },
+  hidden: { scale: 0.85, opacity: 0 },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    transition: { type: "spring" as const, damping: 25, stiffness: 350 },
+  },
+  exit: {
+    scale: 0.9,
+    opacity: 0,
+    transition: { duration: 0.2, ease: "easeIn" as const },
+  },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, x: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: (i: number) => ({
     opacity: 1,
-    x: 0,
-    transition: { delay: 0.15 + i * 0.05, duration: 0.3 },
+    y: 0,
+    transition: { delay: 0.1 + i * 0.06, duration: 0.35, ease: "easeOut" as const },
   }),
 };
 
 export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
   const navigate = useNavigate();
   const [productsOpen, setProductsOpen] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const touchStartX = useRef(0);
 
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
 
-  // Body scroll lock
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -59,34 +64,17 @@ export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
       document.body.style.overflow = "";
       setProductsOpen(false);
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  // Escape key
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-    };
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [open, close]);
 
-  // Swipe to close
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    if (deltaX > 50) close();
-  };
-
-  const goTo = (path: string) => {
-    navigate(path);
-    close();
-  };
+  const goTo = (path: string) => { navigate(path); close(); };
 
   const scrollTo = (id: string) => {
     close();
@@ -99,7 +87,7 @@ export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
   return (
     <AnimatePresence>
       {open && (
-        <>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center">
           {/* Backdrop */}
           <motion.div
             key="backdrop"
@@ -107,16 +95,15 @@ export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
             initial="hidden"
             animate="visible"
             exit="hidden"
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[1000] bg-black/60"
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 bg-black/70 backdrop-blur-md"
             onClick={close}
             aria-hidden="true"
           />
 
-          {/* Panel */}
+          {/* Pop-up Panel */}
           <motion.div
             key="panel"
-            ref={panelRef}
             variants={panelVariants}
             initial="hidden"
             animate="visible"
@@ -124,17 +111,15 @@ export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
             role="dialog"
             aria-modal="true"
             aria-label="Navigációs menü"
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
-            className="fixed top-0 right-0 z-[1001] h-full w-[85vw] max-w-[400px] max-[375px]:w-[90vw] bg-background rounded-l-xl flex flex-col overflow-hidden"
+            className="relative z-[1001] w-[90vw] max-w-[380px] max-h-[85vh] rounded-2xl border border-primary/20 flex flex-col overflow-hidden"
             style={{
-              boxShadow: "0 0 40px rgba(0,0,0,0.3)",
-              willChange: "transform",
+              background: "#0c0c0c",
+              boxShadow: "0 0 60px rgba(212,175,55,0.08), 0 25px 50px rgba(0,0,0,0.5)",
             }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-primary/15 shrink-0">
+              <div className="flex items-center gap-2.5">
                 <img src={logoIcon} alt="ScentBox" className="h-8 w-8 object-contain" />
                 <span className="text-foreground text-lg font-bold tracking-tight">
                   ScentBox Hungary
@@ -143,39 +128,14 @@ export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
               <button
                 onClick={close}
                 aria-label="Menü bezárása"
-                className="z-[1002] p-2 -mr-2 rounded-full hover:bg-white/10 transition-colors"
+                className="p-2 -mr-2 rounded-full hover:bg-primary/10 transition-colors group"
               >
-                <X className="h-6 w-6 text-foreground" />
-              </button>
-            </div>
-
-            {/* CTA */}
-            <div className="px-5 pt-5 pb-3 shrink-0">
-              <button
-                onClick={() => goTo("/termekek")}
-                className="group w-full relative overflow-hidden rounded-lg py-3.5 px-6 text-sm font-semibold tracking-widest uppercase transition-all duration-300 active:scale-[0.97]"
-                style={{
-                  background: "linear-gradient(135deg, #d4af37 0%, #c9a030 50%, #d4af37 100%)",
-                  boxShadow: "0 4px 20px rgba(212,175,55,0.25), inset 0 1px 0 rgba(255,255,255,0.2)",
-                  color: "#0a0a0a",
-                  letterSpacing: "0.15em",
-                }}
-              >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  Böngészd az Illatokat
-                  <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                </span>
-                <span
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{
-                    background: "linear-gradient(135deg, #e0be4a 0%, #d4af37 50%, #c9a030 100%)",
-                  }}
-                />
+                <X className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors" />
               </button>
             </div>
 
             {/* Menu Items */}
-            <nav className="flex-1 overflow-y-auto px-6 pt-6 pb-4">
+            <nav className="flex-1 overflow-y-auto px-6 py-5">
               <div className="space-y-0">
                 {MENU_ITEMS.map((item, i) => (
                   <motion.div key={item.label} custom={i} variants={itemVariants} initial="hidden" animate="visible">
@@ -183,15 +143,14 @@ export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
                       <>
                         <button
                           onClick={() => setProductsOpen(!productsOpen)}
-                          className="flex items-center justify-between w-full py-4 text-left text-lg font-medium text-foreground/90 border-b border-white/10 transition-colors active:bg-primary/10 hover:text-primary"
-                          style={{ letterSpacing: "0.02em" }}
+                          className="flex items-center justify-center gap-2 w-full py-3.5 text-center text-xl font-medium tracking-wide text-foreground/90 transition-all hover:text-primary active:scale-[0.98]"
                         >
                           {item.label}
                           <motion.span
                             animate={{ rotate: productsOpen ? 180 : 0 }}
                             transition={{ duration: 0.3 }}
                           >
-                            <ChevronDown className="h-5 w-5 text-primary" />
+                            <ChevronDown className="h-5 w-5 text-primary/70" />
                           </motion.span>
                         </button>
                         <AnimatePresence>
@@ -203,14 +162,12 @@ export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
                               transition={{ duration: 0.3, ease: "easeInOut" }}
                               className="overflow-hidden"
                             >
-                              <div className="pl-5 py-2 space-y-1">
+                              <div className="py-2 space-y-0.5">
                                 {SUBMENU_ITEMS.map((sub) => (
                                   <button
                                     key={sub.label}
-                                    onClick={() =>
-                                      sub.scrollTo ? scrollTo(sub.scrollTo) : goTo(sub.path!)
-                                    }
-                                    className="block w-full text-left py-2.5 text-base text-foreground/60 hover:text-primary transition-colors active:bg-primary/10 rounded-md px-2"
+                                    onClick={() => sub.scrollTo ? scrollTo(sub.scrollTo) : goTo(sub.path!)}
+                                    className="block w-full text-center py-2.5 text-base text-foreground/50 hover:text-primary transition-all active:scale-[0.98]"
                                   >
                                     {sub.label}
                                   </button>
@@ -223,58 +180,69 @@ export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
                     ) : (
                       <button
                         onClick={() => goTo(item.path)}
-                        className="flex items-center justify-between w-full py-4 text-left text-lg font-medium text-foreground/90 border-b border-white/10 transition-colors active:bg-primary/10 hover:text-primary"
-                        style={{ letterSpacing: "0.02em" }}
+                        className="w-full py-3.5 text-center text-xl font-medium tracking-wide text-foreground/90 transition-all hover:text-primary hover:-translate-y-px active:scale-[0.98]"
                       >
                         {item.label}
-                        <ChevronRight className="h-5 w-5 text-primary" />
                       </button>
                     )}
                   </motion.div>
                 ))}
               </div>
 
-              {/* Contact Section */}
-              <div className="mt-8 pt-6 border-t border-white/10 space-y-4">
-                <a
-                  href="tel:+3612345678"
-                  className="flex items-center gap-3 text-foreground/60 hover:text-primary transition-colors py-2"
-                >
-                  <Phone className="h-[18px] w-[18px] text-primary" />
-                  <span className="text-base">+36 1 234 5678</span>
+              {/* Gold Divider */}
+              <motion.div
+                custom={MENU_ITEMS.length}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                className="my-5 h-px"
+                style={{ background: "linear-gradient(90deg, transparent, hsl(var(--primary) / 0.3), transparent)" }}
+              />
+
+              {/* Contact */}
+              <motion.div
+                custom={MENU_ITEMS.length + 1}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                className="space-y-3"
+              >
+                <a href="tel:+3612345678" className="flex items-center justify-center gap-3 text-foreground/50 hover:text-primary transition-colors py-1.5">
+                  <Phone className="h-4 w-4 text-primary/70" />
+                  <span className="text-sm">+36 1 234 5678</span>
                 </a>
-                <a
-                  href="mailto:info@scentbox.hu"
-                  className="flex items-center gap-3 text-foreground/60 hover:text-primary transition-colors py-2"
-                >
-                  <Mail className="h-[18px] w-[18px] text-primary" />
-                  <span className="text-base">info@scentbox.hu</span>
+                <a href="mailto:info@scentbox.hu" className="flex items-center justify-center gap-3 text-foreground/50 hover:text-primary transition-colors py-1.5">
+                  <Mail className="h-4 w-4 text-primary/70" />
+                  <span className="text-sm">info@scentbox.hu</span>
                 </a>
-              </div>
+              </motion.div>
             </nav>
 
-            {/* Promo Banner */}
-            <div
-              className="shrink-0 px-6 py-8 border-t border-primary/20"
-              style={{
-                background: "linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%)",
-              }}
+            {/* CTA Button */}
+            <motion.div
+              custom={MENU_ITEMS.length + 2}
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              className="shrink-0 px-5 pb-5 pt-2"
             >
-              <h3 className="text-white text-xl font-bold mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Prémium Illatok, Különleges Áron
-              </h3>
-              <p className="text-white/80 text-sm mb-4">
-                Fedezd fel designer parfümjeinket
-              </p>
               <button
                 onClick={() => goTo("/termekek")}
-                className="px-7 py-3 rounded-full text-sm font-medium border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all active:scale-95"
+                className="group w-full relative overflow-hidden rounded-xl py-3.5 px-6 text-sm font-semibold tracking-widest uppercase transition-all duration-300 active:scale-[0.97]"
+                style={{
+                  background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.85) 100%)",
+                  boxShadow: "0 4px 20px hsl(var(--primary) / 0.25), inset 0 1px 0 rgba(255,255,255,0.2)",
+                  color: "#0a0a0a",
+                }}
               >
-                Mutasd meg
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Böngészd az Illatokat
+                  <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                </span>
               </button>
-            </div>
+            </motion.div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
