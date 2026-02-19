@@ -1,63 +1,61 @@
 
-# Asztali Navigáció Teljes Újratervezés -- Pop-up Menu + Termékek Dropdown
+# Mobil Szűrő Rendszer -- Valós Idejű Termékszám Kijelzéssel
 
 ## Mi Változik
 
-Két fő változtatás az asztali (desktop) navigációban:
+A mobil szűrő rendszer továbbfejlesztése, hogy minden szűrőopció mellett megjelenjen a hozzá tartozó elérhető termékek száma. Ha például "Férfi" van kiválasztva, akkor a "Dior" márka mellett megjelenik, hogy abból hány darab férfi termék van. A szűrés progresszíven szűkíti a kínálatot, és minden lépésben valós időben frissülnek a számok.
 
-1. **ToolboxPanel (hamburger menü)**: A jobbról becsúszó Sheet panel helyett egy középre pozicionált, lebegő pop-up modal, amely mögött látható marad a weboldal -- hasonlóan a mobil verzióhoz, de asztali méretezéssel
-2. **"Termékek" nav link**: Hover-re animáltan lecsúszó dropdown menü közvetlenül a fejléc alá, professzionális mega-menu stílusban
+## Hogyan Működik
 
----
+1. A felhasználó megnyitja a szűrő panelt mobilon
+2. Minden szűrőopció (pl. "Férfi", "Dior", "EDP") mellett megjelenik egy szám badge, amely mutatja, hány termék felel meg annak az opciónak a jelenleg aktív szűrők kontextusában
+3. Ha "Férfi" aktív, a "Dior" mellett csak a férfi Dior termékek száma jelenik meg
+4. A "Szűrő" floating gomb és az "Alkalmaz" gomb is mutatja a szűrt találatok összszámát (pl. "Alkalmaz (8)")
+5. Az "Alkalmaz" gomb számmal frissül animáltan
 
-## 1. Termékek Dropdown a Header-ben (`src/components/Header.tsx`)
+## Vizuális Megvalósítás
 
-A jelenlegi egyszerű "Termékek" link helyett egy hover-aktivált dropdown:
+- A FilterChip komponens kap egy opcionális `count` propot, amely egy kis badge-ként jelenik meg a chip-en belül
+- A szám gold/primary színnel jelenik meg, halványan, ha 0
+- Ha egy szűrő opció 0 találatot eredményezne, az opció elhalványodik (de nem tiltódik le, hogy a felhasználó lathassa)
+- Az "Alkalmaz" gomb szövege dinamikusan frissül: "Alkalmaz (X termék)" formátumra
+- A floating "Szűrő" gomb is mutatja az aktuális szűrt termékszámot
 
-- **Trigger**: "Termékek" szöveg + ChevronDown ikon, hover-re a dropdown megjelenik
-- **Panel**: A fejléc alá pozicionálva, `absolute` elhelyezés
-- **Tartalom 2 oszlopban**:
-  - **Bal oszlop "Kategóriák"**: Férfi, Női, Uniszex linkek arany hover-rel
-  - **Jobb oszlop "Népszerű"**: Kedvenceink, Doboz Összeállítása, Összes Termék
-- **Stílus**: Sötét háttér (`bg-[#0c0c0c]`), arany szegély (`border-primary/20`), `rounded-xl`, `backdrop-blur-xl`, finom arany box-shadow
-- **Animáció**: Framer Motion `opacity + y` (fentről lefelé csúszik, 0.2s spring)
-- **Bezárás**: Mouse leave-re eltűnik
+## Technikai Részletek
 
-## 2. ToolboxPanel Pop-up Átalakítás (`src/components/ToolboxPanel.tsx`)
+### Módosított fájl: `src/components/ProductFilters.tsx`
 
-A Sheet/SheetContent teljes cseréje saját pop-up modalra:
+1. **FilterChip komponens bovitese**: Uj `count?: number` prop, amely a chip jobb oldalán jelenik meg kis badge-ként
 
-- **Layout**: `fixed inset-0` konténer, flexbox center -- a weboldal átlátszik a háttérben
-- **Backdrop**: `bg-black/60 backdrop-blur-sm` -- enyhébb blur mint mobilon, hogy a háttér látszódjon
-- **Panel méret**: `max-w-[480px] w-[85vw]`, `max-h-[80vh]` -- asztali méretezés
-- **Panel stílus**:
-  - `bg-[#0c0c0c]` háttér, `border border-primary/20`, `rounded-2xl`
-  - Arany glow shadow: `0 0 80px rgba(212,175,55,0.06)`
-- **Animáció**: Scale-up + fade-in (0.88-ról 1-re, spring), staggered menüpont megjelenés
-- **Fejléc**: Logo + "ScentBox Hungary" + elegáns X bezáró gomb arany hover-rel
-- **Tab rendszer megtartása** (Termékek, Kategóriák, Infó, Rólunk) de szebb pill-stílusú tabokkal:
-  - Arany aktív állapot (`bg-primary/15 text-primary border-primary/30`)
-  - Hover effekt a nem aktív tabokon
-- **Menüpont stílus**:
-  - Nagyobb padding, arany hover szín + háttér (`bg-primary/5`)
-  - Arany pont indikátor hover-re
-  - ChevronRight ikon arany hover animációval
-- **Escape + backdrop kattintás bezárás**
-- **Body scroll lock**
+2. **FilterGroup komponens bovitese**: Uj `counts?: Record<string, number>` prop -- minden opcióhoz tartozó termékszám
 
-## 3. Header Módosítások (`src/components/Header.tsx`)
+3. **Szamlalo logika a fo komponensben**: Egy `useMemo`-ban szamitja ki az egyes szuro opciok termekszamat:
+   - Vegigmegy minden szuro csoporton (gender, brand, type)
+   - Minden opciohoz letrehoz egy "mi lenne ha" szurot: a jelenlegi aktiv szurok + az adott opcio
+   - Az `applyFilters` fuggvennyel szamolja ki a talalatok szamat
+   - Ez biztositja, hogy a szamok mindig a jelenlegi kontextust tukrozik
 
-- A "Termékek" link cseréje hover-dropdown triggerre (csak desktop)
-- "Rólunk" és "Kapcsolat" linkek maradnak egyszerű linkeknek
-- A hamburger ikon gomb megmarad -- ToolboxPanel-t nyitja desktopon
+4. **Mobil sheet modositasok**:
+   - Az "Alkalmaz" gomb szovege: `Alkalmaz (${filteredCount} termek)` -- dinamikus szam
+   - A floating gomb: a szurt termekszam megjelenese az aktiv szurok szama mellett
+   - SheetHeader-ben a "Szurok" cim melle kerul egy osszes szurt termek szam
 
----
+5. **Uj prop**: `ProductFilters` kap egy `totalFilteredCount?: number` propot, amelyet a Products oldalrol kap meg
 
-## Technikai Összefoglaló
+### Módosított fájl: `src/pages/Products.tsx`
 
-| Fájl | Változás |
-|------|----------|
-| `src/components/Header.tsx` | "Termékek" dropdown hozzáadása hover-re, framer-motion animáció |
-| `src/components/ToolboxPanel.tsx` | Sheet teljes cseréje pop-up modalra, saját backdrop, scale animáció |
+- Kiszamolja az `applyFilters` eredmenyenek hosszat es atadja a `ProductFilters`-nek `totalFilteredCount` propkent
+- A mobil nezet fejleceben is megjelenik a szurt termekszam
 
-A dropdown a Header-ben megoldja a gyors navigációt a termék kategóriákhoz, míg a ToolboxPanel pop-up az összes menüpontot tartalmazza professzionális elrendezésben.
+### Animaciok
+
+- A szamok frissulesekor enyhe scale pulse animacio (framer-motion `AnimatePresence` + `layoutId`)
+- A 0 talalatos opciok `opacity-40`-nel halvanyodnak el
+- Az "Alkalmaz" gomb szama `key`-vel animalt szamcsere
+
+### FilterChip Szam Megjelenes
+
+A chip-en belul a szoveg utan egy kis kor jelenik meg a szammal:
+- Aktiv chip: arany hatter szam
+- Inaktiv chip: halvany szurke szam
+- 0 talalat: az egesz chip halvanysag (`opacity-40`) de kattinthato marad
