@@ -1,57 +1,63 @@
 
-# Mobil Navigáció -- Pop-up Átalakulás
+# Asztali Navigáció Teljes Újratervezés -- Pop-up Menu + Termékek Dropdown
 
 ## Mi Változik
 
-A jobbról becsúszó panel teljes cseréje egy középre pozicionált, elegáns pop-up modalra, amely professzionálisabb, luxusabb megjelenést ad mobil nézetben.
+Két fő változtatás az asztali (desktop) navigációban:
 
-## Vizuális Koncepció
+1. **ToolboxPanel (hamburger menü)**: A jobbról becsúszó Sheet panel helyett egy középre pozicionált, lebegő pop-up modal, amely mögött látható marad a weboldal -- hasonlóan a mobil verzióhoz, de asztali méretezéssel
+2. **"Termékek" nav link**: Hover-re animáltan lecsúszó dropdown menü közvetlenül a fejléc alá, professzionális mega-menu stílusban
 
-- **Központi pop-up**: A képernyő közepén jelenik meg (nem oldalról csúszik be)
-- **Megjelenés animáció**: Scale-up + fade-in (0.85-ről 1-re skálázódik, mint egy prémium app modal)
-- **Backdrop**: Erős blur + sötét overlay arany finom fénnyel
-- **Panel**: Lekerekített sarkok (rounded-2xl), sötét háttér arany szegéllyel, belső glow effekt
-- **Bezárás**: Elegáns X gomb arany hover-rel a jobb felső sarokban
+---
 
-## Struktúra
+## 1. Termékek Dropdown a Header-ben (`src/components/Header.tsx`)
 
-1. **Fejléc**: Logo + "ScentBox Hungary" + bezáró gomb -- arany alsó szegéllyel
-2. **Navigációs linkek**: Középre igazítva, nagyobb betűméret, arany hover animáció, staggered fade-in
-3. **Bővíthető Termékek almenü**: Animált kinyitás arany akcentusokkal
-4. **Elválasztó vonal**: Arany gradient vonal
-5. **Elérhetőségek**: Telefon + email ikonos linkek, arany ikonok
-6. **CTA gomb**: Arany gradient gomb az alján, "Böngészd az Illatokat"
+A jelenlegi egyszerű "Termékek" link helyett egy hover-aktivált dropdown:
 
-## Technikai Részletek
+- **Trigger**: "Termékek" szöveg + ChevronDown ikon, hover-re a dropdown megjelenik
+- **Panel**: A fejléc alá pozicionálva, `absolute` elhelyezés
+- **Tartalom 2 oszlopban**:
+  - **Bal oszlop "Kategóriák"**: Férfi, Női, Uniszex linkek arany hover-rel
+  - **Jobb oszlop "Népszerű"**: Kedvenceink, Doboz Összeállítása, Összes Termék
+- **Stílus**: Sötét háttér (`bg-[#0c0c0c]`), arany szegély (`border-primary/20`), `rounded-xl`, `backdrop-blur-xl`, finom arany box-shadow
+- **Animáció**: Framer Motion `opacity + y` (fentről lefelé csúszik, 0.2s spring)
+- **Bezárás**: Mouse leave-re eltűnik
 
-### Módosított fájl: `src/components/MobileNav.tsx`
+## 2. ToolboxPanel Pop-up Átalakítás (`src/components/ToolboxPanel.tsx`)
 
-Teljes újraírás:
+A Sheet/SheetContent teljes cseréje saját pop-up modalra:
 
-- **Layout**: `fixed inset-0` konténer, flexbox center-rel a pop-up pozicionálásához
-- **Panel méret**: `w-[90vw] max-w-[380px]`, `max-h-[85vh]` -- nem teljes képernyős, hanem lebegő kártya
-- **Animációk**:
-  - Backdrop: `opacity: 0 -> 1`, `backdrop-blur-md`
-  - Panel: `scale: 0.85, opacity: 0 -> scale: 1, opacity: 1` (spring animáció)
-  - Menüpontok: staggered `y: 15, opacity: 0 -> y: 0, opacity: 1`
-  - Bezárásnál: `scale: 0.9, opacity: 0` (gyors exit)
+- **Layout**: `fixed inset-0` konténer, flexbox center -- a weboldal átlátszik a háttérben
+- **Backdrop**: `bg-black/60 backdrop-blur-sm` -- enyhébb blur mint mobilon, hogy a háttér látszódjon
+- **Panel méret**: `max-w-[480px] w-[85vw]`, `max-h-[80vh]` -- asztali méretezés
 - **Panel stílus**:
-  - `bg-[#0c0c0c]` háttér
-  - `border border-primary/20` arany szegély
-  - `rounded-2xl` lekerekítés
-  - `box-shadow: 0 0 60px rgba(212,175,55,0.08)` finom arany glow
-- **Menüpontok**:
-  - Középre igazítva (`text-center`)
-  - `text-xl font-medium tracking-wide`
-  - Hover: arany szín + enyhe translateY(-1px) emelkedés
-  - Aktív állapot: `scale(0.98)` feedback
-  - Arany pont dekoráció hover-re a szöveg alatt
-- **Swipe gesztus eltávolítása** (pop-up esetén nem releváns, csak backdrop/X bezárás)
-- **Promo banner eltávolítása** -- a pop-up kompaktabb, a CTA gomb elegendő
-- Escape billentyű és backdrop kattintás bezárás megtartása
-- Body scroll lock megtartása
+  - `bg-[#0c0c0c]` háttér, `border border-primary/20`, `rounded-2xl`
+  - Arany glow shadow: `0 0 80px rgba(212,175,55,0.06)`
+- **Animáció**: Scale-up + fade-in (0.88-ról 1-re, spring), staggered menüpont megjelenés
+- **Fejléc**: Logo + "ScentBox Hungary" + elegáns X bezáró gomb arany hover-rel
+- **Tab rendszer megtartása** (Termékek, Kategóriák, Infó, Rólunk) de szebb pill-stílusú tabokkal:
+  - Arany aktív állapot (`bg-primary/15 text-primary border-primary/30`)
+  - Hover effekt a nem aktív tabokon
+- **Menüpont stílus**:
+  - Nagyobb padding, arany hover szín + háttér (`bg-primary/5`)
+  - Arany pont indikátor hover-re
+  - ChevronRight ikon arany hover animációval
+- **Escape + backdrop kattintás bezárás**
+- **Body scroll lock**
 
-### Módosított fájl: `src/components/Header.tsx`
+## 3. Header Módosítások (`src/components/Header.tsx`)
 
-- A hamburger ikon X-re váltása megtartása (már implementálva van)
-- Egyéb változás nem szükséges, a `MobileNav` props interface nem változik
+- A "Termékek" link cseréje hover-dropdown triggerre (csak desktop)
+- "Rólunk" és "Kapcsolat" linkek maradnak egyszerű linkeknek
+- A hamburger ikon gomb megmarad -- ToolboxPanel-t nyitja desktopon
+
+---
+
+## Technikai Összefoglaló
+
+| Fájl | Változás |
+|------|----------|
+| `src/components/Header.tsx` | "Termékek" dropdown hozzáadása hover-re, framer-motion animáció |
+| `src/components/ToolboxPanel.tsx` | Sheet teljes cseréje pop-up modalra, saját backdrop, scale animáció |
+
+A dropdown a Header-ben megoldja a gyors navigációt a termék kategóriákhoz, míg a ToolboxPanel pop-up az összes menüpontot tartalmazza professzionális elrendezésben.
