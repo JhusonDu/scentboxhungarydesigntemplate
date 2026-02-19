@@ -150,16 +150,27 @@ export const MobileNav = ({ open, onOpenChange }: MobileNavProps) => {
             </div>
 
             {/* CTA */}
-            <div className="px-5 pt-4 pb-2 shrink-0">
+            <div className="px-5 pt-5 pb-3 shrink-0">
               <button
                 onClick={() => goTo("/termekek")}
-                className="w-full py-2.5 px-5 rounded-full text-white text-sm font-medium transition-transform active:scale-95"
+                className="group w-full relative overflow-hidden rounded-lg py-3.5 px-6 text-sm font-semibold tracking-widest uppercase transition-all duration-300 active:scale-[0.97]"
                 style={{
-                  background: "linear-gradient(135deg, #d4af37, #f4e4c1)",
-                  boxShadow: "0 2px 8px rgba(212,175,55,0.3)",
+                  background: "linear-gradient(135deg, #d4af37 0%, #c9a030 50%, #d4af37 100%)",
+                  boxShadow: "0 4px 20px rgba(212,175,55,0.25), inset 0 1px 0 rgba(255,255,255,0.2)",
+                  color: "#0a0a0a",
+                  letterSpacing: "0.15em",
                 }}
               >
-                Böngészd az Illatokat
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Böngészd az Illatokat
+                  <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                </span>
+                <span
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    background: "linear-gradient(135deg, #e0be4a 0%, #d4af37 50%, #c9a030 100%)",
+                  }}
+                />
               </button>
             </div>
 
