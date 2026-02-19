@@ -1,61 +1,79 @@
 
-# Mobil Szűrő Rendszer -- Valós Idejű Termékszám Kijelzéssel
 
-## Mi Változik
+# Gyors Választás Gomb + Quick Buy Pop-up Rendszer
 
-A mobil szűrő rendszer továbbfejlesztése, hogy minden szűrőopció mellett megjelenjen a hozzá tartozó elérhető termékek száma. Ha például "Férfi" van kiválasztva, akkor a "Dior" márka mellett megjelenik, hogy abból hány darab férfi termék van. A szűrés progresszíven szűkíti a kínálatot, és minden lépésben valós időben frissülnek a számok.
+## Mi Valtozik
 
-## Hogyan Működik
+1. **ProductCard "Gyors Valasztas" gomb ujratervezese** -- professzionalis design, jobb animaciok, reszponziv megjelenes
+2. **A gomb mostantol pop-up-ot nyit** a kozvetlen kosarazas helyett, igy a felhasznalo kivalaszthatja a meretet (ml), mennyiseget, es lathatja a reszleteket
+3. **ProductQuickBuy pop-up luxus ujratervezese** -- framer-motion animaciok, szebb layout, tobb informacio megjelenites
 
-1. A felhasználó megnyitja a szűrő panelt mobilon
-2. Minden szűrőopció (pl. "Férfi", "Dior", "EDP") mellett megjelenik egy szám badge, amely mutatja, hány termék felel meg annak az opciónak a jelenleg aktív szűrők kontextusában
-3. Ha "Férfi" aktív, a "Dior" mellett csak a férfi Dior termékek száma jelenik meg
-4. A "Szűrő" floating gomb és az "Alkalmaz" gomb is mutatja a szűrt találatok összszámát (pl. "Alkalmaz (8)")
-5. Az "Alkalmaz" gomb számmal frissül animáltan
+---
 
-## Vizuális Megvalósítás
+## 1. ProductCard Gomb Ujratervezes (`src/components/ProductCard.tsx`)
 
-- A FilterChip komponens kap egy opcionális `count` propot, amely egy kis badge-ként jelenik meg a chip-en belül
-- A szám gold/primary színnel jelenik meg, halványan, ha 0
-- Ha egy szűrő opció 0 találatot eredményezne, az opció elhalványodik (de nem tiltódik le, hogy a felhasználó lathassa)
-- Az "Alkalmaz" gomb szövege dinamikusan frissül: "Alkalmaz (X termék)" formátumra
-- A floating "Szűrő" gomb is mutatja az aktuális szűrt termékszámot
+### Desktop gomb:
+- A "Gyors Valasztas" szoveg helyett **"Gyors Valasztas"** marad, de szebb tipografia es gold glow
+- `backdrop-blur-xl` erosebb hatter, sima felcsuszo animacio
+- Hover-re enyhe scale (1.02) es intenzivebb glow
+- A gomb kattintasra **megallitja a Link navigaciot** (`e.preventDefault()`) es **megnyitja a QuickBuy pop-up-ot**
 
-## Technikai Részletek
+### Mobil gomb:
+- Marad a kerek ikon gomb, de szebb gold shadow-val
+- Szinten pop-up-ot nyit kozvetlen kosarazas helyett
 
-### Módosított fájl: `src/components/ProductFilters.tsx`
+### Uj state es callback:
+- `onQuickBuy` callback prop hozzaadasa a ProductCard-hoz
+- A ProductGrid-ben es Products oldalon kezeljuk a `quickBuyProduct` state-et
 
-1. **FilterChip komponens bovitese**: Uj `count?: number` prop, amely a chip jobb oldalán jelenik meg kis badge-ként
+## 2. ProductGrid + Products Oldal Integralas
 
-2. **FilterGroup komponens bovitese**: Uj `counts?: Record<string, number>` prop -- minden opcióhoz tartozó termékszám
+### `src/components/ProductGrid.tsx`:
+- Uj `quickBuyProduct` allapot a grid-ben
+- `ProductQuickBuy` rendereles a grid aljara
+- `ProductCard`-nak `onQuickBuy` prop atadasa
 
-3. **Szamlalo logika a fo komponensben**: Egy `useMemo`-ban szamitja ki az egyes szuro opciok termekszamat:
-   - Vegigmegy minden szuro csoporton (gender, brand, type)
-   - Minden opciohoz letrehoz egy "mi lenne ha" szurot: a jelenlegi aktiv szurok + az adott opcio
-   - Az `applyFilters` fuggvennyel szamolja ki a talalatok szamat
-   - Ez biztositja, hogy a szamok mindig a jelenlegi kontextust tukrozik
+### `src/components/ProductCard.tsx`:
+- Uj prop: `onQuickBuy?: (product: ShopifyProduct) => void`
+- A gomb kattintaskor meghivja `onQuickBuy(product)` a direkt `addItem` helyett
 
-4. **Mobil sheet modositasok**:
-   - Az "Alkalmaz" gomb szovege: `Alkalmaz (${filteredCount} termek)` -- dinamikus szam
-   - A floating gomb: a szurt termekszam megjelenese az aktiv szurok szama mellett
-   - SheetHeader-ben a "Szurok" cim melle kerul egy osszes szurt termek szam
+## 3. ProductQuickBuy Pop-up Luxus Ujratervezes (`src/components/ProductQuickBuy.tsx`)
 
-5. **Uj prop**: `ProductFilters` kap egy `totalFilteredCount?: number` propot, amelyet a Products oldalrol kap meg
+### Vizualis valtozasok:
+- **Nagyobb kep**: 24x24 (96px) meretu, kerekitett, enyhe arany szegely
+- **Vendor + cim** professzionalisabb tipografiaval
+- **Ar kiemelese** arany glow-val
+- **Variant (meret) selector**: Pill-stilusu gombok, az aktiv kivalasztas arany hatterrel es finom glow-val, minden variant mellett az adott meret ara is megjelenik
+- **Mennyiseg valaszto**: Szebb rounded gombok arany hover efektussal
+- **Osszeg kijelzes**: A variant ar x mennyiseg = vegosszeg kijelzese a CTA gombok felett
+- **"Reszletek megtekintese" link**: Kicsi link a termek reszletes oldalara (`/product/[handle]`)
+- **Elerheto badge**: Ha a kivalasztott variant elerheto, zold "Keszleten" jelzo; ha nem, piros "Elfogyott"
 
-### Módosított fájl: `src/pages/Products.tsx`
+### Animaciok (framer-motion):
+- Dialog tartalom: `scale` 0.95-rol 1-re + `opacity` fade-in, spring animacio
+- Variant gombok: staggered megjelenes (egyenkent)
+- CTA gombok: enyhe slide-up a variant kivalasztas utan
+- Ar frissulese: `AnimatePresence` szam-csere animacio meret valtas eseten
 
-- Kiszamolja az `applyFilters` eredmenyenek hosszat es atadja a `ProductFilters`-nek `totalFilteredCount` propkent
-- A mobil nezet fejleceben is megjelenik a szurt termekszam
+### Megjelenendo informaciok osszefoglalva:
+- Termek kep (nagyobb)
+- Marka (vendor)
+- Termek nev
+- Kivalasztott meret ara (dinamikus)
+- Meret valaszto (5ml, 10ml, 15ml stb.)
+- Mennyiseg valaszto (+/-)
+- Vegosszeg (ar x mennyiseg)
+- Elerheto allapot jelzo
+- "Kosarazas" es "Vasarlas" CTA gombok
+- "Reszletek" link a termek oldalra
 
-### Animaciok
+---
 
-- A szamok frissulesekor enyhe scale pulse animacio (framer-motion `AnimatePresence` + `layoutId`)
-- A 0 talalatos opciok `opacity-40`-nel halvanyodnak el
-- Az "Alkalmaz" gomb szama `key`-vel animalt szamcsere
+## Technikai Osszefoglalo
 
-### FilterChip Szam Megjelenes
+| Fajl | Valtozas |
+|------|----------|
+| `src/components/ProductCard.tsx` | Uj `onQuickBuy` prop, gomb ujratervezes, pop-up megnyitas direkt kosarazas helyett |
+| `src/components/ProductGrid.tsx` | `quickBuyProduct` state, `ProductQuickBuy` rendereles, `onQuickBuy` callback |
+| `src/components/ProductQuickBuy.tsx` | Teljes vizualis ujratervezes: nagyobb kep, ar animaciok, vegosszeg, elerheto badge, reszletek link, framer-motion |
 
-A chip-en belul a szoveg utan egy kis kor jelenik meg a szammal:
-- Aktiv chip: arany hatter szam
-- Inaktiv chip: halvany szurke szam
-- 0 talalat: az egesz chip halvanysag (`opacity-40`) de kattinthato marad
