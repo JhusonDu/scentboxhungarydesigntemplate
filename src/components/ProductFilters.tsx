@@ -394,23 +394,13 @@ export const ProductFilters = ({
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="fixed bottom-5 left-0 right-0 z-40 flex justify-center pointer-events-none"
           >
-            <Button className="rounded-full px-5 h-10 shadow-2xl gap-2 pointer-events-auto backdrop-blur-md bg-primary/90" size="lg">
+            <Button className="rounded-full px-6 h-11 shadow-[0_4px_20px_hsl(43_65%_52%/0.3)] gap-2.5 pointer-events-auto backdrop-blur-md bg-primary hover:bg-primary/90 transition-all duration-300" size="lg">
               <SlidersHorizontal className="w-4 h-4" />
-              Szűrő
+              <span className="font-semibold tracking-wide">Szűrő</span>
               {activeCount > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                <span className="h-5 min-w-5 px-1.5 text-[11px] font-bold rounded-full bg-background text-primary flex items-center justify-center">
                   {activeCount}
-                </Badge>
-              )}
-              {totalFilteredCount !== undefined && activeCount > 0 && (
-                <motion.span
-                  key={totalFilteredCount}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="text-xs text-primary-foreground/80"
-                >
-                  · {totalFilteredCount}
-                </motion.span>
+                </span>
               )}
             </Button>
           </motion.div>
