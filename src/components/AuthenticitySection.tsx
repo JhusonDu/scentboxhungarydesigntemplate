@@ -1,5 +1,4 @@
 import { ShieldCheck, Eye, Award } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const trustBlocks = [
   {
@@ -56,15 +55,6 @@ export const AuthenticitySection = () => {
           ))}
         </div>
 
-        {/* CTA */}
-        <div className="text-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
-          <Button 
-            variant="outline"
-            className="border-primary text-foreground hover:bg-primary/10"
-          >
-            Hogyan Ellenőrizzük az Eredetiséget
-          </Button>
-        </div>
       </div>
     </section>
   );
