@@ -90,27 +90,26 @@ export const Header = ({ isSearchOpen: externalOpen, onSearchOpenChange, searchI
 
         <div className="container flex h-14 md:h-20 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="group">
+          <Link to="/" className="flex items-center gap-2 md:gap-3 group">
             <motion.div
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              className="flex items-center gap-[6px]"
-            >
+              className="relative">
+
+              <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <img
-                src="/lovable-uploads/cffba5ca-0963-46f8-895d-57cc9d9a8eed.png"
-                alt="S"
-                className="h-8 w-8 md:h-9 md:w-9 object-contain drop-shadow-lg"
-              />
-              <div className="flex flex-col leading-none">
-                <span className="text-lg md:text-xl font-semibold tracking-tight text-foreground font-display whitespace-nowrap">
-                  centBox
-                </span>
-                <span className="text-[9px] md:text-[10px] font-medium tracking-[0.25em] uppercase text-primary/70 mt-[1px]">
-                  Hungary
-                </span>
-              </div>
+                alt="ScentBox"
+                className="h-11 w-11 md:h-12 md:w-12 object-contain relative z-10 drop-shadow-lg" src="/lovable-uploads/cffba5ca-0963-46f8-895d-57cc9d9a8eed.png" />
             </motion.div>
+            <div className="flex flex-col leading-none">
+              <span className="text-lg md:text-xl font-semibold tracking-tight text-foreground font-display">
+                ScentBox
+              </span>
+              <span className="text-[10px] md:text-xs font-medium tracking-[0.25em] uppercase text-primary/70">
+                Hungary
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation Links */}
