@@ -1,32 +1,39 @@
 
-# Desktop Product Grid -- Tighter, Denser Layout
 
-## Problem
+# Featured Products Section -- Denser Grid + Stronger CTA
 
-Currently the desktop grid shows **3 columns on large screens** (`lg:grid-cols-3`) and **4 columns on extra-large** (`xl:grid-cols-4`) with `md:gap-6` spacing. This wastes space and shows fewer products above the fold.
+## Changes
 
-## Solution
+### 1. Denser Desktop Grid (src/components/FeaturedProducts.tsx)
 
-Increase column count and reduce spacing/card sizing for a denser, more professional catalog feel on desktop:
+- **More products:** Show **8 products** instead of 6 (`.slice(0, 8)`)
+- **More columns:** Grid changes from `md:grid-cols-3` to `md:grid-cols-4` on desktop
+- **Tighter gaps:** Reduce gap from `md:gap-5` to `md:gap-4`
+- **Skeleton loader** updated to match (8 skeletons, 4 columns)
 
-### Modified file: `src/components/ProductGrid.tsx`
+### 2. Compact Featured Cards (src/components/FeaturedProducts.tsx)
 
-- Change grid classes from `grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` to `grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5`
-- Reduce gap from `md:gap-6` to `md:gap-4`
+- **Smaller image:** Desktop aspect ratio from `md:aspect-[3/4]` to `md:aspect-[4/5]` (slightly taller/narrower for compact feel)
+- **Tighter text:** Reduce card padding from `md:p-4` to `md:p-3`, title from `md:text-base` to `text-sm`, price from `text-lg` to `text-base`
+- **Quick buy button:** Smaller text and padding to fit the compact cards
 
-### Modified file: `src/components/ProductCard.tsx`
+### 3. Redesigned CTA -- Centered "View All" Button (src/components/FeaturedProducts.tsx)
 
-- Reduce image aspect ratio on desktop from `md:aspect-[4/5]` to `md:aspect-[3/4]` for more compact cards
-- Slightly reduce text sizes on desktop: product name from `md:text-base` to `md:text-sm`, price from `md:text-lg` to `md:text-base`
-- Reduce bottom spacing between image and info from `md:mb-4` to `md:mb-3`
+Replace the small inline "Osszes Megtekintese" link in the header with a prominent, centered CTA button below the grid:
 
-### Modified file: `src/pages/Products.tsx`
+- Remove the desktop "Osszes Megtekintese" link from the header row
+- Add a centered block after the grid with a styled button:
+  - Full-width on mobile, auto-width on desktop
+  - Primary outline style with arrow icon
+  - Gold glow hover effect matching brand aesthetic
+  - Text: "Osszes Termek Megtekintese" with ArrowRight icon
 
-- Update the product count bar text styling to stay consistent with the new denser layout (no structural change needed)
+### 4. Mobile stays 2 columns, mobile CTA merges with the new centered one
+
+The existing mobile "Osszes Megtekintese" div gets replaced by the new universal centered CTA that works on both mobile and desktop.
 
 ## Result
 
-- **Before:** 3-4 products per row on desktop
-- **After:** 4-5 products per row on desktop, with tighter spacing and proportionally smaller cards
-- Mobile stays unchanged at 2 columns
-- More products visible above the fold without scrolling
+- **Before:** 6 products in 3 columns, small text link for "view all" tucked in the header
+- **After:** 8 products in 4 columns (desktop), compact cards, prominent centered CTA button below the grid pushing users to the full catalog
+
