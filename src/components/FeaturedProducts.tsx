@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { ShoppingBag, SlidersHorizontal, Sparkles, X, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useProducts } from "@/hooks/useProducts";
 import { ShopifyProduct } from "@/lib/shopify";
@@ -52,7 +52,7 @@ const FeaturedCard = ({ product, onQuickBuy }: { product: ShopifyProduct; onQuic
         className="bg-card rounded-xl overflow-hidden shadow-md hover:shadow-[0_8px_30px_-8px_hsl(var(--primary)/0.25)] transition-shadow duration-300 border border-border/50"
       >
         {/* Image */}
-        <div className="relative aspect-square md:aspect-[3/4] bg-secondary overflow-hidden">
+        <div className="relative aspect-square md:aspect-[4/5] bg-secondary overflow-hidden">
           {image ? (
             <img
               src={image.url}
@@ -77,22 +77,22 @@ const FeaturedCard = ({ product, onQuickBuy }: { product: ShopifyProduct; onQuic
               className="flex-1 bg-primary/95 backdrop-blur-sm text-primary-foreground text-sm font-semibold py-2.5 rounded-lg hover:bg-primary transition-colors flex items-center justify-center gap-1.5 active:scale-95"
               aria-label={`${node.title} gyors választás`}
             >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              Gyors választás
+              <ShoppingBag className="w-3 h-3" />
+              Választás
             </button>
           </div>
         </div>
 
-        <div className="p-3 md:p-4 space-y-1">
+        <div className="p-3 space-y-1">
           {node.vendor && (
             <span className="text-[11px] uppercase tracking-widest text-primary font-medium">
               {node.vendor}
             </span>
           )}
-          <h3 className="text-sm md:text-base font-semibold text-foreground line-clamp-2 leading-snug">
+          <h3 className="text-sm font-semibold text-foreground line-clamp-2 leading-snug">
             {node.title}
           </h3>
-          <p className="text-lg font-bold text-primary drop-shadow-[0_0_6px_hsl(var(--primary)/0.4)]">
+          <p className="text-base font-bold text-primary drop-shadow-[0_0_6px_hsl(var(--primary)/0.4)]">
             {formatPrice(price.amount, price.currencyCode)}
           </p>
         </div>
@@ -104,7 +104,7 @@ const FeaturedCard = ({ product, onQuickBuy }: { product: ShopifyProduct; onQuic
 /* ── skeleton loader ── */
 const CardSkeleton = () => (
   <div className="rounded-xl overflow-hidden bg-card border border-border/50">
-    <Skeleton className="aspect-square md:aspect-[3/4] w-full" />
+    <Skeleton className="aspect-square md:aspect-[4/5] w-full" />
     <div className="p-3 md:p-4 space-y-2">
       <Skeleton className="h-3 w-16" />
       <Skeleton className="h-4 w-3/4" />
@@ -134,7 +134,7 @@ export const FeaturedProducts = () => {
 
   const filteredProducts = useMemo(() => {
     if (!products) return [];
-    return applyFilters(products, activeFilters).slice(0, 6);
+    return applyFilters(products, activeFilters).slice(0, 8);
   }, [products, activeFilters]);
 
   const totalFilteredCount = useMemo(() => {
@@ -187,19 +187,15 @@ export const FeaturedProducts = () => {
               </button>
             )}
 
-            <Link
-              to="/termekek"
-              className="text-sm text-primary hover:underline font-medium hidden md:inline-flex items-center gap-1 hover:drop-shadow-[0_0_6px_hsl(var(--primary)/0.4)] transition-all"
-            >
-              Összes Megtekintése →
-            </Link>
+
+
           </div>
         </div>
 
         {/* Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
-            {Array.from({ length: 6 }).map((_, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
               <CardSkeleton key={i} />
             ))}
           </div>
@@ -212,7 +208,7 @@ export const FeaturedProducts = () => {
           </div>
         ) : (
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5"
+            className="grid grid-cols-2 md:grid-cols-4 gap-4"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -223,13 +219,14 @@ export const FeaturedProducts = () => {
           </motion.div>
         )}
 
-        {/* Mobile "view all" */}
-        <div className="mt-6 text-center md:hidden">
+        {/* Centered CTA */}
+        <div className="mt-8 md:mt-10 text-center">
           <Link
             to="/termekek"
-            className="text-sm text-primary hover:underline font-medium hover:drop-shadow-[0_0_6px_hsl(var(--primary)/0.4)] transition-all"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-full border-2 border-primary/60 text-primary font-semibold text-sm md:text-base hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_24px_hsl(var(--primary)/0.35)] transition-all duration-300 active:scale-95"
           >
-            Összes Megtekintése →
+            Összes Termék Megtekintése
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
